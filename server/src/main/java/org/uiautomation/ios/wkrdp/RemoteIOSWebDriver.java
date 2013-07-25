@@ -18,7 +18,13 @@ import com.google.common.collect.ImmutableList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.uiautomation.ios.client.uiamodels.impl.NoOpNativeDriver;
 import org.uiautomation.ios.context.BaseWebInspector;
 import org.uiautomation.ios.context.WebInspector;
 import org.uiautomation.ios.server.DOMContext;
@@ -98,10 +104,8 @@ public class RemoteIOSWebDriver {
         Configuration.off();
       }
       protocol = new RealDeviceProtocolImpl(notification, finders);
-
     } else {
       protocol = new SimulatorProtocolImpl(notification, finders);
-
     }
     protocol.register();
     sync.waitForSimToRegister();
@@ -148,7 +152,7 @@ public class RemoteIOSWebDriver {
                                                + "is stale.It might still exist, but the "
                                                + "window with focus has changed.");
     }
-    if (session != null) {
+    if (session != null && (!(session.getNativeDriver() instanceof NoOpNativeDriver))) {
       return new RemoteWebNativeBackedElement(new NodeId(nodeId), currentInspector, session);
     } else {
       return new RemoteWebElement(new NodeId(nodeId), currentInspector);
@@ -257,7 +261,7 @@ public class RemoteIOSWebDriver {
   public String getTitle() {
     return currentInspector.getTitle();
   }
-  
+
   public int getCurrentPageID() {
     return currentInspector.getPageIdentifier();
   }

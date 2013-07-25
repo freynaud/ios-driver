@@ -18,6 +18,11 @@ public class IPAApplication extends APPIOSApplication {
   private final File ipa;
   private static final Logger log = Logger.getLogger(IPAApplication.class.getName());
 
+
+  protected IPAApplication() {
+    ipa = null;
+  }
+
   private IPAApplication(File ipa, String pathToApp) {
     super(pathToApp);
     this.ipa = ipa;

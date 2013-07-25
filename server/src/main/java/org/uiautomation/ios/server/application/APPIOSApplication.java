@@ -53,6 +53,11 @@ public class APPIOSApplication {
   private final File app;
   private final List<LanguageDictionary> dictionaries = new ArrayList<LanguageDictionary>();
 
+
+  protected APPIOSApplication(){
+    metadata=null;
+    app=null;
+  }
   /**
    * @param pathToApp
    * @throws WebDriverException
@@ -300,7 +305,6 @@ public class APPIOSApplication {
   }
 
   public void setDefaultDevice(DeviceType device) {
-
     try {
       File plist = new File(app, "Info.plist");
 
@@ -336,9 +340,8 @@ public class APPIOSApplication {
       write(plist,root,format);
     } catch (Exception e) {
       throw new WebDriverException("Cannot change the default device for the app." + e.getMessage(),
-                                   e);
+          e);
     }
-
   }
 
   enum PListFormat{

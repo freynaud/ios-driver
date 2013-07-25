@@ -17,12 +17,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.remote.Response;
 import org.uiautomation.ios.IOSCapabilities;
+import org.uiautomation.ios.client.uiamodels.impl.NoOpNativeDriver;
 import org.uiautomation.ios.communication.WebDriverLikeRequest;
 import org.uiautomation.ios.server.IOSServerManager;
 import org.uiautomation.ios.server.ServerSideSession;
 import org.uiautomation.ios.server.command.PostHandleDecorator;
 import org.uiautomation.ios.server.command.UIAScriptHandler;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +51,27 @@ public class GetCapabilitiesNHandler extends UIAScriptHandler {
   @Override
   public Response handle() throws Exception {
     if (cachedResponse == null) {
-      cachedResponse = super.handle();
+      // TODO freynaud create a specific handler for app without instruments ? is there any other app than
+      // safari for that ?
+      if (getDriver().getSession(getRequest().getSession())
+          .getNativeDriver() instanceof NoOpNativeDriver) {
+        Response r = new Response();
+        r.setSessionId(getRequest().getSession());
+        r.setState(null);
+        r.setStatus(0);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("takesScreenshot",false);
+        map.put("browserName", "Safari");
+        map.put("browserVersion", "8536.25");
+        map.put("CFBundleIdentifier","com.apple.mobilesafari");
+        map.put("javascriptEnabled",true);
+        map.put(IOSCapabilities.DEVICE,"iphone");
+        r.setValue(map);
+        cachedResponse=r;
+        hasBeenDecorated=true;
+      } else {
+        cachedResponse = super.handle();
+      }
     }
     return cachedResponse;
   }
@@ -94,7 +116,7 @@ public class GetCapabilitiesNHandler extends UIAScriptHandler {
       o.put("javascriptEnabled", true);
       o.put("cssSelectors", true);
       o.put("takesElementScreenshot", false);
-      
+
       o.put(IOSCapabilities.SIMULATOR, true);
       o.put(IOSCapabilities.DEVICE, session.getCapabilities().getDevice());
       o.put(IOSCapabilities.VARIATION, session.getCapabilities().getDeviceVariation());

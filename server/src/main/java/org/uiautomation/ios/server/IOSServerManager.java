@@ -13,6 +13,8 @@
  */
 package org.uiautomation.ios.server;
 
+import org.libimobiledevice.binding.raw.DeviceDetectionCallback;
+import org.libimobiledevice.binding.raw.IMobileDeviceFactory;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriverException;
 import org.uiautomation.ios.IOSCapabilities;
@@ -20,9 +22,9 @@ import org.uiautomation.ios.server.application.APPIOSApplication;
 import org.uiautomation.ios.server.application.AppleLanguage;
 import org.uiautomation.ios.server.application.IOSRunningApplication;
 import org.uiautomation.ios.server.application.ResourceCache;
+import org.uiautomation.ios.server.application.SafariIPAApplication;
 import org.uiautomation.ios.server.configuration.Configuration;
-import org.uiautomation.iosdriver.DeviceDetector;
-import org.uiautomation.iosdriver.services.DeviceManagerService;
+import org.libimobiledevice.binding.raw.DeviceInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,15 +35,18 @@ import java.util.logging.Logger;
 
 public class IOSServerManager {
 
+  private IMobileDeviceFactory factory;
   private final List<ServerSideSession> sessions = new ArrayList<ServerSideSession>();
   private static final Logger log = Logger.getLogger(IOSServerManager.class.getName());
 
   private final HostInfo hostInfo;
   private final ResourceCache cache = new ResourceCache();
-  private DeviceManagerService deviceManager;
+
   private DeviceStore devices;
   private final IOSServerConfiguration options;
   public final ApplicationStore apps;
+
+  private final DevicePluggedEvent monitor = new DevicePluggedEvent();
 
   // TODO freynaud cleanup
   public IOSServerManager(IOSServerConfiguration options) {
@@ -52,35 +57,51 @@ public class IOSServerManager {
     } catch (Exception e) {
       System.err.println("Cannot configure logger.");
     }
+<<<<<<< HEAD
     this.hostInfo = new HostInfo(options);
 
 
     devices = new DeviceStore();
+=======
+    this.hostInfo = new HostInfo(options.getPort());
+    devices = new DeviceStore();
+    devices.add(new SimulatorDevice());
+>>>>>>> d51273682b837be2e451ec565ef2cfd69bfca459
 
     if (Configuration.BETA_FEATURE) {
-      //LoggerService.enableDebug();
-      DeviceDetector d = DeviceManagerService.getDetector();
-      if (d == null) {
-        devices = new DeviceStore();
-        devices.add(new SimulatorDevice());
-      } else {
-        devices = (DeviceStore) d;
-      }
-      deviceManager = DeviceManagerService.create(devices);
-      deviceManager.startDetection();
+      factory = IMobileDeviceFactory.INSTANCE;
+      factory.setDeviceDetectionCallback(monitor);
+      factory.startDetection();
     }
+    apps = new ApplicationStore(options.getAppFolderToMonitor());
+  }
 
+
+<<<<<<< HEAD
     if (Configuration.SIMULATORS_ENABLED){
       devices.add(new SimulatorDevice());
     }
 
     apps = new ApplicationStore(options.getAppFolderToMonitor());
+=======
+  class DevicePluggedEvent implements DeviceDetectionCallback {
 
+    @Override
+    public void onDeviceAdded(String uuid) {
+      DeviceInfo d = new DeviceInfo(uuid);
+      devices.add(new RealDevice(d));
+    }
+>>>>>>> d51273682b837be2e451ec565ef2cfd69bfca459
+
+    @Override
+    public void onDeviceRemoved(String uuid) {
+      devices.remove(uuid);
+    }
   }
 
   public void stop() {
     if (Configuration.BETA_FEATURE) {
-      deviceManager.stopDetection();
+      factory.stopDetection();
     }
   }
 
@@ -128,6 +149,11 @@ public class IOSServerManager {
 
   public IOSRunningApplication findAndCreateInstanceMatchingApplication(
       IOSCapabilities desiredCapabilities) {
+
+    if (desiredCapabilities.getBundleName().equals("Safari") && !desiredCapabilities.isSimulator()){
+      return new SafariIPAApplication().createInstance(desiredCapabilities.getLanguage());
+    }
+
     for (APPIOSApplication app : getApplicationStore().getApplications()) {
       IOSCapabilities appCapabilities = app.getCapabilities();
       if (APPIOSApplication.canRun(desiredCapabilities, appCapabilities)) {

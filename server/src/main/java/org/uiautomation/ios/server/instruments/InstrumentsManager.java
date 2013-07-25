@@ -14,6 +14,8 @@
 
 package org.uiautomation.ios.server.instruments;
 
+import org.libimobiledevice.binding.raw.IMobileDeviceFactory;
+import org.libimobiledevice.binding.raw.IOSDevice;
 import org.openqa.selenium.WebDriverException;
 import org.uiautomation.ios.IOSCapabilities;
 import org.uiautomation.ios.communication.device.DeviceType;
@@ -97,7 +99,10 @@ public class InstrumentsManager {
       output = createTmpOutputFolder();
 
       this.application = application;
-      this.application.setDefaultDevice(deviceType);
+
+      if (capabilities.isSimulator()) {
+        this.application.setDefaultDevice(deviceType);
+      }
 
       deviceManager = prepareSimulator(capabilities);
       if (isWarmupRequired(sdkVersion)) {
@@ -110,28 +115,37 @@ public class InstrumentsManager {
         ((IOSSimulatorManager) deviceManager).forceDefaultSDK();
         log.fine("creating script");
       }
-      File
-          uiscript =
-          new ScriptHelper()
-              .getScript(port, application.getDotAppAbsolutePath(), sessionId);
-      log.fine("starting instruments");
-      List<String> instruments = createInstrumentCommand(uiscript.getAbsolutePath());
-      communicationChannel = new CommunicationChannel();
 
-      simulatorProcess = new Command(instruments, true);
-      simulatorProcess.setWorkingDirectory(output);
-      simulatorProcess.start();
+      boolean safariReal = device instanceof RealDevice && caps.getBundleName().equals("Safari");
+      if (safariReal) {
+        IOSDevice dev = IMobileDeviceFactory.INSTANCE.get(((RealDevice) device).getUuid());
+        dev.startApp("com.apple.mobilesafari");
+      } else{
+        File
+            uiscript =
+            new ScriptHelper()
+                .getScript(port, application.getDotAppAbsolutePath(), sessionId);
+        log.fine("starting instruments");
+        List<String> instruments = createInstrumentCommand(uiscript.getAbsolutePath());
+        communicationChannel = new CommunicationChannel();
 
-      log.fine("waiting for registration request");
-      boolean success = communicationChannel.waitForUIScriptToBeStarted();
-      // appears only in ios6. : Automation Instrument ran into an exception
-      // while trying to run the
-      // script. UIAScriptAgentSignaledException
-      if (!success) {
-        simulatorProcess.forceStop();
-        killSimulator();
-        throw new WebDriverException("Instruments crashed.");
+        simulatorProcess = new Command(instruments, true);
+        simulatorProcess.setWorkingDirectory(output);
+        simulatorProcess.start();
+
+        log.fine("waiting for registration request");
+        boolean success = communicationChannel.waitForUIScriptToBeStarted();
+        // appears only in ios6. : Automation Instrument ran into an exception
+        // while trying to run the
+        // script. UIAScriptAgentSignaledException
+        if (!success) {
+          simulatorProcess.forceStop();
+          killSimulator();
+          throw new WebDriverException("Instruments crashed.");
+        }
+
       }
+
 
       if (timeHack) {
         TimeSpeeder.getInstance().activate();
@@ -156,7 +170,6 @@ public class InstrumentsManager {
         log.fine("creating script");
       }
     }
-
   }
 
   private void warmup() {

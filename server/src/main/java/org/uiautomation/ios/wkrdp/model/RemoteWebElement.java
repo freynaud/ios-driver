@@ -61,7 +61,7 @@ public class RemoteWebElement {
     inspector.checkForPageLoad();
   }
 
-  // TODO freyanud no return here.
+  // TODO freynaud no return here.
   private void clickAtom() {
     try {
       String f = "(function(arg) { " + "var text = " + IosAtoms.CLICK + "(arg);" + "return text;})";

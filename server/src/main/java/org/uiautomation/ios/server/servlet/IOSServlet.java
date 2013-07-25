@@ -77,6 +77,7 @@ public class IOSServlet extends DriverBasedServlet {
 
     WebDriverLikeRequest req = new WebDriverLikeRequest(request);
 
+    System.out.println(req.toJSON(2));
     response.setContentType("application/json;charset=UTF-8");
     response.setCharacterEncoding("UTF-8");
 

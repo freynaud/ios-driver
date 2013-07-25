@@ -14,9 +14,15 @@
 
 package org.uiautomation.ios.wkrdp.internal;
 
+import org.libimobiledevice.binding.raw.IMobileDeviceFactory;
+import org.libimobiledevice.binding.raw.IMobileDeviceService;
+import org.libimobiledevice.binding.raw.IOSDevice;
+import org.libimobiledevice.binding.raw.WebInspectorService;
 import org.uiautomation.ios.wkrdp.MessageListener;
 import org.uiautomation.ios.wkrdp.ResponseFinder;
-import org.uiautomation.iosdriver.services.WebInspectorService;
+import org.uiautomation.ios.wkrdp.message.IOSMessage;
+
+import java.util.UUID;
 
 /**
  * WKRDP implementation for real device using a USB connection.
@@ -28,25 +34,69 @@ public class RealDeviceProtocolImpl extends WebKitRemoteDebugProtocol {
   public RealDeviceProtocolImpl(MessageListener listener,
                                 ResponseFinder... finders) {
     super(listener, finders);
-    inspector = new WebInspectorService("d1ce6333af579e27d166349dc8a1989503ba5b4f");
+    IOSDevice d = IMobileDeviceFactory.INSTANCE.get("ff4827346ed6b54a98f51e69a261a140ae2bf6b3");
+    inspector = new WebInspectorService(d);
     start();
   }
 
+  public RealDeviceProtocolImpl(){
+    super(new MessageListener() {
+      @Override
+      public void onMessage(IOSMessage message) {
+        System.out.println(message);
+      }
+    });
+    IOSDevice d = IMobileDeviceFactory.INSTANCE.get("ff4827346ed6b54a98f51e69a261a140ae2bf6b3");
+    inspector = new WebInspectorService(d);
+    start();
+  }
+
+  public static void main(String[] args){
+    RealDeviceProtocolImpl r = new  RealDeviceProtocolImpl();
+  }
+
+
+  public static String key = UUID.randomUUID().toString();
   @Override
   public void start() {
-    inspector.start();
+    inspector.startWebInspector();
     startListenerThread();
+    //inspector.sendMessage(
+    /*sendMessage(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" +
+                          "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">"
+                          + "\n" +
+                          "<plist version=\"1.0\">" + "\n" +
+                          " <dict>" + "\n" +
+                          " <key>__argument</key>" + "\n" +
+                          " <dict>" + "\n" +
+                          " <key>WIRConnectionIdentifierKey</key>" + "\n" +
+                          //" <string>9128c1d9-069d-4751-b45b-bbcb6e7e8591</string>" + "\n" +
+                          " <string>"+ key+"</string>" + "\n" +
+                          " </dict>" + "\n" +
+                          " <key>__selector</key>" + "\n" +
+                          " <string>_rpc_reportIdentifier:</string>" + "\n" +
+                          " </dict>" + "\n" +
+                          "</plist>" + "\n");*/
+    /*try {
+      Thread.sleep(10000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }*/
   }
 
   @Override
   public void stop() {
     stopListenerThread();
-    inspector.stop();
+    inspector.stopWebInspector();
   }
 
   @Override
   protected void read() throws Exception {
+    //System.out.println("Reading ...");
     String msg = inspector.receiveMessage();
+    //System.out.println("Read : "+msg);
+
     if (msg != null) {
       handler.handle(msg);
     }

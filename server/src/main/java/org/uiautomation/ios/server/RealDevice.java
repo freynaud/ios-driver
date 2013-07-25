@@ -1,12 +1,29 @@
+/*
+ * Copyright 2012 ios-driver committers.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under the License
+ *  is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ *  or implied. See the License for the specific language governing permissions and limitations under
+ *  the License.
+ */
+
 package org.uiautomation.ios.server;
 
+import org.libimobiledevice.binding.raw.ApplicationInfo;
+import org.libimobiledevice.binding.raw.DeviceInfo;
+import org.libimobiledevice.binding.raw.IMobileDeviceFactory;
 import org.uiautomation.ios.IOSCapabilities;
 import org.uiautomation.ios.communication.device.DeviceType;
 import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.server.application.APPIOSApplication;
 import org.uiautomation.ios.server.application.IPAApplication;
-import org.uiautomation.iosdriver.ApplicationInfo;
-import org.uiautomation.iosdriver.DeviceInfo;
+
+
 import org.uiautomation.iosdriver.services.DeviceInstallerService;
 
 import java.util.List;
@@ -19,7 +36,7 @@ public class RealDevice extends Device {
   private final String buildVersion;
   private final String productType;
   private final String iosVersion;
-  private final DeviceInstallerService installer;
+  private IMobileDeviceFactory factory = IMobileDeviceFactory.INSTANCE;
 
   public RealDevice(DeviceInfo info) {
     this.uuid = info.getUniqueDeviceID();
@@ -28,7 +45,6 @@ public class RealDevice extends Device {
     this.buildVersion = info.getBuildVersion();
     this.productType = info.getProductType();
     this.iosVersion = info.getProductVersion();
-    installer = new DeviceInstallerService(uuid);
   }
 
 
@@ -57,7 +73,8 @@ public class RealDevice extends Device {
   }
 
   public List<ApplicationInfo> getApplications() {
-    return installer.getUserApplications();
+    String xml =factory.get(uuid).listApplication("list_user");
+    return ApplicationInfo.extractApplications(xml);
   }
 
   @Override

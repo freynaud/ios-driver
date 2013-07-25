@@ -62,13 +62,20 @@ public class RemoteIOSDriver extends RemoteWebDriver
   private int port;
   private DriverConfiguration configuration;
   protected WebDriverLikeCommandExecutor executor;
-  private TouchScreen touchScreen;
+  protected TouchScreen touchScreen;
 
 
   protected RemoteIOSDriver() {
     super();
     executor = new WebDriverLikeCommandExecutor(this);
     touchScreen = new RemoteTouchScreen(getExecuteMethod());
+
+  }
+
+  protected RemoteIOSDriver(WebDriverLikeCommandExecutor ex,TouchScreen ts) {
+    super();
+    executor = ex;
+    touchScreen = ts;
 
   }
 

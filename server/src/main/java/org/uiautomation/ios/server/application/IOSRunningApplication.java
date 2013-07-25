@@ -60,7 +60,6 @@ public class IOSRunningApplication {
         "Cannot find " + lang + " in the supported languages for the app.");*/
   //}
 
-
   private List<ContentResult> getPotentialMatches(String name) throws WebDriverException {
     LanguageDictionary dict = underlyingApplication.getDictionary(currentLanguage);
     List<ContentResult> res = dict.getPotentialMatches(name);

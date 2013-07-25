@@ -1,7 +1,7 @@
 package org.uiautomation.ios.server.servlet;
 
+import org.libimobiledevice.binding.raw.ApplicationInfo;
 import org.uiautomation.ios.server.RealDevice;
-import org.uiautomation.iosdriver.ApplicationInfo;
 
 import java.io.IOException;
 

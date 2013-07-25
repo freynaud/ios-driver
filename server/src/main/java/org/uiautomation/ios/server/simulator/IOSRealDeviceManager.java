@@ -1,5 +1,8 @@
 package org.uiautomation.ios.server.simulator;
 
+import org.libimobiledevice.binding.raw.ApplicationInfo;
+import org.libimobiledevice.binding.raw.IMobileDeviceFactory;
+import org.libimobiledevice.binding.raw.IOSDevice;
 import org.openqa.selenium.WebDriverException;
 import org.uiautomation.ios.IOSCapabilities;
 import org.uiautomation.ios.communication.device.DeviceType;
@@ -7,9 +10,9 @@ import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.server.RealDevice;
 import org.uiautomation.ios.server.application.APPIOSApplication;
 import org.uiautomation.ios.server.application.IPAApplication;
+import org.uiautomation.ios.server.application.SafariIPAApplication;
 import org.uiautomation.ios.server.instruments.IOSDeviceManager;
-import org.uiautomation.iosdriver.ApplicationInfo;
-import org.uiautomation.iosdriver.services.DeviceInstallerService;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +24,8 @@ public class IOSRealDeviceManager implements IOSDeviceManager {
   private final RealDevice device;
   private final IOSCapabilities capabilities;
   private final IPAApplication app;
-  private final DeviceInstallerService service;
+  private IMobileDeviceFactory factory =IMobileDeviceFactory.INSTANCE;
+  private final IOSDevice d;
   private final String bundleId;
   private final List<String> keysToConsiderInThePlistToHaveEquality;
 
@@ -35,7 +39,7 @@ public class IOSRealDeviceManager implements IOSDeviceManager {
     bundleId = capabilities.getBundleId();
     this.capabilities = capabilities;
     this.app = app;
-    this.service = new DeviceInstallerService(device.getUuid());
+    this.d = factory.get(device.getUuid());
 
     keysToConsiderInThePlistToHaveEquality = new ArrayList<String>();
     keysToConsiderInThePlistToHaveEquality.add("CFBundleVersion");
@@ -43,26 +47,27 @@ public class IOSRealDeviceManager implements IOSDeviceManager {
 
   @Override
   public void install(APPIOSApplication aut) {
+
     if (aut instanceof IPAApplication) {
-      ApplicationInfo app = service.getApplication(bundleId);
+      ApplicationInfo app = d.getApplication(bundleId);
       // not installed ? install the app.
       if (app == null) {
-        service.install(((IPAApplication) aut).getIPAFile());
+        d.install(((IPAApplication) aut).getIPAFile());
         return;
       }
 
       // already there and correct version
-      if (isCorrectVersion(app)) {
+      if (app.getApplicationId().equals("com.apple.mobilesafari") || isCorrectVersion(app)) {
         return;
       }
 
       // TODO upgrade ?
       // needs to re-install
       log.fine("uninstalling " + bundleId + " for " + device.getUuid());
-      service.uninstall(bundleId);
+      d.uninstall(bundleId);
       log.fine("installing " + bundleId + " for " + device.getUuid());
-      service.install(((IPAApplication) aut).getIPAFile());
-      log.fine(bundleId + " for " + service.getDeviceId() + " installed.");
+      d.install(((IPAApplication) aut).getIPAFile());
+      log.fine(bundleId + " for " + d.getDeviceId() + " installed.");
     } else {
       throw new WebDriverException("only IPA apps can be used on a real device.");
     }
@@ -92,13 +97,13 @@ public class IOSRealDeviceManager implements IOSDeviceManager {
 
   @Override
   public void setL10N(String locale, String language) {
-    service.setLanguage("fr");
-    service.setLocale(locale);
+    d.setLockDownValue("com.apple.international", "Language", "en");
+    d.setLockDownValue("com.apple.international", "Locale", "en_GB");
   }
 
   @Override
   public void resetContentAndSettings() {
-    service.emptyApplicationCache("com.ebay.iphone");
+    //d.emptyApplicationCache("com.ebay.iphone");
   }
 
   @Override
