@@ -10,7 +10,7 @@ public class SafariIPAApplication extends IPAApplication {
   }
 
   @Override
-  List<AppleLocale> getSupportedLanguages() {
+  List<AppleLanguage> getSupportedLanguages() {
     // TODO freynaud for now.
     return new ArrayList<>();
   }

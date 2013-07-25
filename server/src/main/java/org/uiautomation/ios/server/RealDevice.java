@@ -19,12 +19,8 @@ import org.libimobiledevice.binding.raw.DeviceInfo;
 import org.libimobiledevice.binding.raw.IMobileDeviceFactory;
 import org.uiautomation.ios.IOSCapabilities;
 import org.uiautomation.ios.communication.device.DeviceType;
-import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.server.application.APPIOSApplication;
 import org.uiautomation.ios.server.application.IPAApplication;
-
-
-import org.uiautomation.iosdriver.services.DeviceInstallerService;
 
 import java.util.List;
 

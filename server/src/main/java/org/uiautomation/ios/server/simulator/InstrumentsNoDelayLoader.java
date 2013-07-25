@@ -1,7 +1,6 @@
 package org.uiautomation.ios.server.simulator;
 
 import org.apache.commons.io.IOUtils;
-import org.uiautomation.iosdriver.IOSDriverServiceException;
 
 import java.io.File;
 import java.io.FileOutputStream;

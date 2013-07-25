@@ -57,33 +57,23 @@ public class IOSServerManager {
     } catch (Exception e) {
       System.err.println("Cannot configure logger.");
     }
-<<<<<<< HEAD
     this.hostInfo = new HostInfo(options);
-
-
     devices = new DeviceStore();
-=======
-    this.hostInfo = new HostInfo(options.getPort());
-    devices = new DeviceStore();
-    devices.add(new SimulatorDevice());
->>>>>>> d51273682b837be2e451ec565ef2cfd69bfca459
 
     if (Configuration.BETA_FEATURE) {
       factory = IMobileDeviceFactory.INSTANCE;
       factory.setDeviceDetectionCallback(monitor);
       factory.startDetection();
     }
-    apps = new ApplicationStore(options.getAppFolderToMonitor());
-  }
-
-
-<<<<<<< HEAD
     if (Configuration.SIMULATORS_ENABLED){
       devices.add(new SimulatorDevice());
     }
 
     apps = new ApplicationStore(options.getAppFolderToMonitor());
-=======
+  }
+
+
+
   class DevicePluggedEvent implements DeviceDetectionCallback {
 
     @Override
@@ -91,7 +81,6 @@ public class IOSServerManager {
       DeviceInfo d = new DeviceInfo(uuid);
       devices.add(new RealDevice(d));
     }
->>>>>>> d51273682b837be2e451ec565ef2cfd69bfca459
 
     @Override
     public void onDeviceRemoved(String uuid) {
@@ -149,11 +138,6 @@ public class IOSServerManager {
 
   public IOSRunningApplication findAndCreateInstanceMatchingApplication(
       IOSCapabilities desiredCapabilities) {
-
-    if (desiredCapabilities.getBundleName().equals("Safari") && !desiredCapabilities.isSimulator()){
-      return new SafariIPAApplication().createInstance(desiredCapabilities.getLanguage());
-    }
-
     for (APPIOSApplication app : getApplicationStore().getApplications()) {
       IOSCapabilities appCapabilities = app.getCapabilities();
       if (APPIOSApplication.canRun(desiredCapabilities, appCapabilities)) {
