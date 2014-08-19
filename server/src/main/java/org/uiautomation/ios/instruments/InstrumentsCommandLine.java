@@ -106,6 +106,7 @@ public class InstrumentsCommandLine implements Instruments {
       instrumentsPid = ClassicCommands.getHighestPidForName("instruments");
 
       log.fine("waiting for registration request");
+      log.warning("starting to wait");
       success = channel.waitForUIScriptToBeStarted(timeout);
       synchronized (this) {
         properlyStarted = success;
