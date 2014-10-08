@@ -14,25 +14,39 @@
 
 package org.uiautomation.ios.xcode;
 
-import org.uiautomation.ios.utils.Command;
 
-import java.util.Arrays;
+public class Xcode5Runtime implements XcodeRuntime {
 
-/**
- * Created by freynaud on 19/09/2014.
- */
-public class Xcode601 implements Xcode {
+  private final String version;
 
-
-  @Override
-  public void openURL(String uuid,String url) {
-    String[] args = new String[]{"xcrun", "simctl", "openurl", "51CB648A-25C7-4E16-AAB5-0FDBEBF4E700", url};
-    Command c = new Command(Arrays.asList(args), false);
-    c.executeAndWait(true,5000);
+  public Xcode5Runtime(String version) {
+    this.version = version;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
-  public static void loadSimulatorInfo() {
+    Xcode5Runtime that = (Xcode5Runtime) o;
 
+    if (!version.equals(that.version)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public String getVersion(){
+    return version;
+  }
+
+  @Override
+  public int hashCode() {
+    return version.hashCode();
   }
 }

@@ -14,25 +14,9 @@
 
 package org.uiautomation.ios.xcode;
 
-import org.uiautomation.ios.utils.Command;
-
-import java.util.Arrays;
-
 /**
- * Created by freynaud on 19/09/2014.
+ * Created by freynaud on 08/10/2014.
  */
-public class Xcode601 implements Xcode {
+public interface XcodeRuntime {
 
-
-  @Override
-  public void openURL(String uuid,String url) {
-    String[] args = new String[]{"xcrun", "simctl", "openurl", "51CB648A-25C7-4E16-AAB5-0FDBEBF4E700", url};
-    Command c = new Command(Arrays.asList(args), false);
-    c.executeAndWait(true,5000);
-  }
-
-
-  public static void loadSimulatorInfo() {
-
-  }
 }

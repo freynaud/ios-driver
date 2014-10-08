@@ -21,15 +21,18 @@ import org.uiautomation.ios.IOSCapabilities;
 import org.uiautomation.ios.RealDevice;
 import org.uiautomation.ios.ServerSideSession;
 import org.uiautomation.ios.SessionNotInitializedException;
+import org.uiautomation.ios.SimulatorDevice;
 import org.uiautomation.ios.application.IOSRunningApplication;
 import org.uiautomation.ios.command.UIAScriptRequest;
 import org.uiautomation.ios.command.UIAScriptResponse;
 import org.uiautomation.ios.command.uiautomation.StopInstrumentsRunLoop;
 import org.uiautomation.ios.instruments.commandExecutor.CURLIAutomationCommandExecutor;
 import org.uiautomation.ios.instruments.commandExecutor.UIAutomationCommandExecutor;
+import org.uiautomation.ios.utils.AppleMagicString;
 import org.uiautomation.ios.utils.ClassicCommands;
 import org.uiautomation.ios.utils.Command;
 import org.uiautomation.ios.utils.CommandOutputListener;
+import org.uiautomation.ios.xcode.Xcode6Device;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,7 +116,7 @@ public class InstrumentsCommandLine implements Instruments {
       } else {
         log.warning("instruments crashed. Waiting before retrying");
         try {
-          String uuid = session.getDevice6().getUuid();
+          String uuid = ((Xcode6Device)session.getDeviceTmp()).getUuid();
           log.warning("trying to shutdown " + uuid);
           ClassicCommands.shutdownByUUid(uuid);
           log.info("Killing Sim");
@@ -194,9 +197,14 @@ public class InstrumentsCommandLine implements Instruments {
       args.add(uuid);
     } else if (application.isSimulator()) {
       args.add("-w");
-//      args.add(AppleMagicString.getDeviceSpecification(caps.getDevice(), caps.getDeviceVariation(),
-//                                                       desiredSDKVersion, version));
-      args.add(session.getDevice6().getKey());
+      //args.add(session.getDevice6().getKey());
+      if (session.getDevice() instanceof SimulatorDevice.RunningSimulatorDevice){
+        SimulatorDevice.RunningSimulatorDevice rd = (SimulatorDevice.RunningSimulatorDevice)session.getDevice();
+      args.add(rd.getKey());
+
+      }else{
+        log.warning("not supported ?");
+      }
     }
     args.add("-t");
     args.add(template.getAbsolutePath());

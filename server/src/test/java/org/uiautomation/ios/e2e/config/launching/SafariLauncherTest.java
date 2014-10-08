@@ -50,7 +50,7 @@ public abstract class SafariLauncherTest extends BaseIOSDriverTest {
   @DataProvider
   public abstract Object[][] invalid();
 
-  @Test(dataProvider = "sdkAndSafariVersion",invocationCount = 10)
+  @Test(dataProvider = "sdkAndSafariVersion",invocationCount = 1)
   public void supportAllInstalledSDKsSafari(String sdk, String version, DeviceVariation variation) throws InterruptedException {
     try {
       IOSCapabilities cap = IOSCapabilities.iphone("Safari", version);

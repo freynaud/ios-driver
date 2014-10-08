@@ -151,6 +151,7 @@ UIAElement.prototype.tap = function (opt_XFactor, opt_YFactor) {
         };
 
         UIATarget.localTarget().tap(point);
+        log("tapping("+point.x+","+point.y+")");
         UIATarget.localTarget().delay(0.1);
         var newScreen = !this.isVisible();
         if (newScreen) {

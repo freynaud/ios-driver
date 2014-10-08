@@ -17,6 +17,7 @@ package org.uiautomation.ios.e2e.config.launching;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
+import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.utils.ClassicCommands;
 import org.uiautomation.ios.utils.IOSVersion;
 
@@ -42,8 +43,15 @@ public class Xcode6NativeLauncherTest extends NativeLauncherTest {
     Object[][] res = new Object[][]{
         //http://openradar.appspot.com/radar?id=5221532267708416
 //        {"7.0.3", "2.10"},
-        {"7.1", "2.10"},
-        {"8.0", "2.10"}
+        {"7.1",  DeviceVariation.iPhone4s},
+        {"7.1",  DeviceVariation.iPhone5},
+        {"7.1",  DeviceVariation.iPhone5s},
+
+        {"8.0",  DeviceVariation.iPhone4s},
+        {"8.0",  DeviceVariation.iPhone5},
+        {"8.0",  DeviceVariation.iPhone5s},
+        {"8.0",  DeviceVariation.iPhone6},
+        {"8.0",  DeviceVariation.iPhone6Plus},
     };
     return res;
   }

@@ -15,7 +15,6 @@
 package org.uiautomation.ios.e2e.config.launching;
 
 
-import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -26,7 +25,9 @@ import org.uiautomation.ios.IOSCapabilities;
 import org.uiautomation.ios.client.uiamodels.impl.RemoteIOSDriver;
 import org.uiautomation.ios.communication.device.DeviceVariation;
 
-public abstract  class NativeLauncherTest extends BaseIOSDriverTest {
+public abstract class NativeLauncherTest extends BaseIOSDriverTest {
+
+  private final static String version = "2.10";
 
   @BeforeClass
   public abstract void checkSetup();
@@ -41,17 +42,17 @@ public abstract  class NativeLauncherTest extends BaseIOSDriverTest {
   public abstract Object[][] sdk();
 
 
-
   @Test(dataProvider = "sdk")
-  public void supportAllInstalledSDKs(String sdk,String version) {
+  public void supportAllInstalledSDKs(String sdk, DeviceVariation variation) {
     try {
       IOSCapabilities cap = IOSCapabilities.iphone("UICatalog");
       cap.setSDKVersion(sdk);
+      cap.setDeviceVariation(variation);
       driver = new RemoteIOSDriver(getRemoteURL(), cap);
       IOSCapabilities actual = driver.getCapabilities();
 
       Assert.assertEquals(actual.getSDKVersion(), sdk);
-      Assert.assertEquals(actual.getBundleVersion(),version);
+      Assert.assertEquals(actual.getBundleVersion(), version);
 
 
     } finally {

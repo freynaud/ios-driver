@@ -37,13 +37,14 @@ public enum DeviceVariation {
   iPadRetina_64bit,
 
 
-  // ios8 ones
+  // ios8 format
   ResizableiPad,
   ResizableiPhone,
 
   iPad2,
   iPadAir,
 
+  iPhone4,
   iPhone4s,
   iPhone5,
   iPhone5s,

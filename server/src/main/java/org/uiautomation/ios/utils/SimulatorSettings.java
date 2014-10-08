@@ -25,6 +25,7 @@ import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.HostInfo;
 import org.uiautomation.ios.command.uiautomation.NewSessionNHandler;
 import org.uiautomation.ios.instruments.InstrumentsVersion;
+import org.uiautomation.ios.xcode.Xcode6Device;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -212,7 +213,8 @@ public class SimulatorSettings {
         System.err.println("couldn't re-create: " + contentAndSettingsFolder);
       }
     } else {
-      String uuid=session.getDevice6().getUuid();
+
+      String uuid=((Xcode6Device)session.getDeviceTmp()).getUuid();
       log.info("Reset content and settings");
       ClassicCommands.eraseSimByUUID(uuid);
 

@@ -17,7 +17,11 @@ package org.uiautomation.ios;
 import org.uiautomation.ios.application.APPIOSApplication;
 import org.uiautomation.ios.application.IPAApplication;
 import org.uiautomation.ios.communication.device.DeviceType;
+import org.uiautomation.ios.communication.device.DeviceVariation;
+import org.uiautomation.ios.instruments.InstrumentsVersion;
 import org.uiautomation.ios.utils.ClassicCommands;
+import org.uiautomation.ios.xcode.XcodeDeviceType;
+import org.uiautomation.ios.xcode.XcodeRuntime;
 
 import java.util.List;
 
@@ -61,6 +65,36 @@ public class SimulatorDevice extends Device {
 
   @Override
   public String toString() {
-    return "Simulator[(sdks="+getAltSDK()+")" + (isBusy() ? "in use by ios-driver" : "available") + ']';
+    return "Simulator[(sdks=" + getAltSDK() + ")" + (isBusy() ? "in use by ios-driver" : "available") + ']';
+  }
+
+
+  public RunningSimulatorDevice getSpecificDevice(DeviceType device, DeviceVariation variation, String sdk, InstrumentsVersion v) {
+    return new RunningSimulatorDevice(this, device, variation, sdk, v);
+  }
+
+
+  public static class RunningSimulatorDevice extends SimulatorDevice {
+
+    private final DeviceType device;
+    private final DeviceVariation variation;
+    private final String sdk;
+    private final InstrumentsVersion v;
+    private final SimulatorDevice sim;
+
+    public RunningSimulatorDevice(SimulatorDevice sim, DeviceType device, DeviceVariation variation, String sdk, InstrumentsVersion v) {
+      this.sim = sim;
+      this.device = device;
+      this.variation = variation;
+      this.sdk = sdk;
+      this.v = v;
+    }
+
+    public String getKey() {
+      XcodeRuntime rt = sim.info.getDeviceUUIDMap().getRuntime(sdk);
+      XcodeDeviceType t = sim.info.getDeviceUUIDMap().getDeviceType(variation);
+      return sim.info.getDeviceUUIDMap().getDevice(rt, t).getInstrumentsWDevice();
+    }
+
   }
 }

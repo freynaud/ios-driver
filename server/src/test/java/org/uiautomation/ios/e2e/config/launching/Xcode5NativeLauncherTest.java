@@ -17,6 +17,7 @@ package org.uiautomation.ios.e2e.config.launching;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
+import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.utils.ClassicCommands;
 import org.uiautomation.ios.utils.IOSVersion;
 
@@ -40,10 +41,10 @@ public class Xcode5NativeLauncherTest extends NativeLauncherTest {
   @Override
   public Object[][] sdk() {
     Object[][] res = new Object[][]{
-        {"6.0", "1.0"},
-        {"6.1", "1.0"},
-        {"7.0.3", "1.0"},
-        {"7.1", "1.0"},
+        {"6.0", DeviceVariation.iPhone5},
+//        {"6.1", DeviceVariation.iPhone5},
+//        {"7.0.3", DeviceVariation.iPhone5},
+//        {"7.1", DeviceVariation.iPhone5},
     };
     return res;
   }

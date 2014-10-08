@@ -80,4 +80,6 @@ public abstract class Device {
   public final boolean isBusy() {
     return busy;
   }
+
+
 }

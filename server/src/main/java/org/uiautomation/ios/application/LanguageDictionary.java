@@ -72,6 +72,7 @@ public class LanguageDictionary {
    * load the content of the binary file and returns it as a json object.
    */
   public JSONObject readContentFromBinaryFile(File binaryFile) throws Exception {
+    Runtime.getRuntime().gc();
     PlistFileUtils util = new PlistFileUtils(binaryFile);
     return util.toJSON();
   }

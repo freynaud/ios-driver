@@ -154,7 +154,7 @@ public class IOSDualDriver {
   private void forceWebViewToReloadManually(int retry) {
 
     if (1 == 1) {
-      XcodeFactory.create().openURL(session.getDevice6().getUuid(), "http://about:blank");
+      XcodeFactory.create().openURL(session.getDeviceTmp().getInstrumentsWDevice(), "http://about:blank");
       log.info("got current url");
       try {
         String url = getRemoteWebDriver().getCurrentUrl();

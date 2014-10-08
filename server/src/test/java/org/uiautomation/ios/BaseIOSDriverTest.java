@@ -105,7 +105,7 @@ public abstract class BaseIOSDriverTest {
       driver = null;
     }
   }
-  
+
   protected final URL getRemoteURL() {
     try {
       URL remote = new URL("http://" + config.getHost() + ":" + config.getPort() + "/wd/hub");

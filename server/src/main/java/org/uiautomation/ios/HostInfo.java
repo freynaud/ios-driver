@@ -16,7 +16,9 @@ package org.uiautomation.ios;
 
 import org.uiautomation.ios.instruments.InstrumentsVersion;
 import org.uiautomation.ios.utils.ClassicCommands;
-import org.uiautomation.ios.utils.DeviceUUIDsMap;
+import org.uiautomation.ios.utils.DeviceMapping;
+import org.uiautomation.ios.utils.DeviceMappingFactory;
+import org.uiautomation.ios.utils.XCode6DeviceMapping;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ public final class HostInfo {
   private final File xCodeInstall;
   private final InstrumentsVersion instrumentsVersion;
   private final int port;
-  private DeviceUUIDsMap deviceUUIDMap;
+  private DeviceMapping deviceMapping;
 
   public HostInfo(IOSServerConfiguration config) {
     this.port = config.getPort();
@@ -49,8 +51,8 @@ public final class HostInfo {
       installedSimulators = ClassicCommands.getInstalledSDKs();
       xCodeInstall = ClassicCommands.getXCodeInstall();
       instrumentsVersion = ClassicCommands.getInstrumentsVersion();
-      deviceUUIDMap = new DeviceUUIDsMap();
-      deviceUUIDMap.loadData();
+      deviceMapping = DeviceMappingFactory.create();
+      deviceMapping.init();
     } else {
       simulatorVersion = "";
       installedSimulators = new ArrayList<String>();
@@ -87,7 +89,7 @@ public final class HostInfo {
       return javaVersion;
   }
 
-  public DeviceUUIDsMap getDeviceUUIDMap() {
-    return deviceUUIDMap;
+  public DeviceMapping getDeviceUUIDMap() {
+    return deviceMapping;
   }
 }

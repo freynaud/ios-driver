@@ -28,7 +28,7 @@ function UIAutomationException(message, status) {
 function log(msg) {
     UIALogger.logMessage("log:" + msg);
     if (DEBUG === true) {
-        UIAutomation.pushLogToServer(msg);
+        UIAutomation.pushLogToServer(""+msg);
     }
 
 }

@@ -14,25 +14,32 @@
 
 package org.uiautomation.ios.xcode;
 
-import org.uiautomation.ios.utils.Command;
 
-import java.util.Arrays;
-
-/**
- * Created by freynaud on 19/09/2014.
- */
-public class Xcode601 implements Xcode {
+public class Xcode5Device implements XcodeDevice {
 
 
-  @Override
-  public void openURL(String uuid,String url) {
-    String[] args = new String[]{"xcrun", "simctl", "openurl", "51CB648A-25C7-4E16-AAB5-0FDBEBF4E700", url};
-    Command c = new Command(Arrays.asList(args), false);
-    c.executeAndWait(true,5000);
+  private final Xcode5Runtime rt;
+  private final Xcode5DeviceType type;
+
+  public Xcode5Runtime getRuntime() {
+    return rt;
   }
 
+  public Xcode5DeviceType getDeviceType() {
+    return type;
+  }
 
-  public static void loadSimulatorInfo() {
+  public Xcode5Device(Xcode5Runtime rt, Xcode5DeviceType type) {
+    this.rt = rt;
+    this.type = type;
+  }
 
+  public boolean isValid() {
+    return true;
+  }
+
+  @Override
+  public String getInstrumentsWDevice() {
+    return type.getName() + " - Simulator - iOS " + rt.getVersion();
   }
 }

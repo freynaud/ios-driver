@@ -17,6 +17,7 @@ import org.libimobiledevice.ios.driver.binding.exceptions.SDKException;
 import org.libimobiledevice.ios.driver.binding.services.DeviceService;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.uiautomation.ios.UIAModels.Session;
 import org.uiautomation.ios.application.APPIOSApplication;
 import org.uiautomation.ios.application.AppleLanguage;
@@ -258,8 +259,9 @@ public class IOSServerManager {
   public Device findAndReserveMatchingDevice(IOSCapabilities desiredCapabilities) {
     List<Device> devices = getDeviceStore().getDevices();
     for (Device device : devices) {
-      if (1 == 1) {
-        return device;
+      if (device instanceof SimulatorDevice) {
+        IOSCapabilities d = desiredCapabilities;
+        return ((SimulatorDevice)device).getSpecificDevice(d.getDevice(),d.getDeviceVariation(),d.getSDKVersion(),hostInfo.getInstrumentsVersion());
       }
       IOSCapabilities deviceCapabilities = device.getCapability();
       if (Device.canRun(desiredCapabilities, deviceCapabilities)) {

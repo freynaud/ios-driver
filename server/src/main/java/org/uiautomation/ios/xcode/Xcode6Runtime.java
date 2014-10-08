@@ -14,25 +14,37 @@
 
 package org.uiautomation.ios.xcode;
 
-import org.uiautomation.ios.utils.Command;
 
-import java.util.Arrays;
+public class Xcode6Runtime implements XcodeRuntime {
 
-/**
- * Created by freynaud on 19/09/2014.
- */
-public class Xcode601 implements Xcode {
+  private final String shortVersion;
+  private final String version;
 
 
-  @Override
-  public void openURL(String uuid,String url) {
-    String[] args = new String[]{"xcrun", "simctl", "openurl", "51CB648A-25C7-4E16-AAB5-0FDBEBF4E700", url};
-    Command c = new Command(Arrays.asList(args), false);
-    c.executeAndWait(true,5000);
+  private final String build;
+  private final String details;
+
+
+  public Xcode6Runtime(String shortVersion, String version, String build, String details) {
+    this.shortVersion = shortVersion;
+    this.version = version;
+    this.build = build;
+    this.details = details;
   }
 
+  public String getShortVersion() {
+    return shortVersion;
+  }
 
-  public static void loadSimulatorInfo() {
+  public String getVersion() {
+    return version;
+  }
 
+  public String getBuild() {
+    return build;
+  }
+
+  public String getDetails() {
+    return details;
   }
 }

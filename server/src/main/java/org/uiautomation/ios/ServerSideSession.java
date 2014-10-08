@@ -37,9 +37,14 @@ import org.uiautomation.ios.session.monitor.MaxTimeBetween2CommandsMonitor;
 import org.uiautomation.ios.session.monitor.ServerSideSessionMonitor;
 import org.uiautomation.ios.session.monitor.SessionTimeoutMonitor;
 import org.uiautomation.ios.utils.ClassicCommands;
-import org.uiautomation.ios.utils.DeviceUUIDsMap;
+import org.uiautomation.ios.utils.DeviceMapping;
+import org.uiautomation.ios.utils.XCode6DeviceMapping;
 import org.uiautomation.ios.utils.ZipUtils;
 import org.uiautomation.ios.xcode.Xcode601;
+import org.uiautomation.ios.xcode.Xcode6Device;
+import org.uiautomation.ios.xcode.XcodeDevice;
+import org.uiautomation.ios.xcode.XcodeDeviceType;
+import org.uiautomation.ios.xcode.XcodeRuntime;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -63,7 +68,7 @@ public class ServerSideSession extends Session {
   private final DriverConfiguration configuration;
   private IOSRunningApplication application;
   private Device device;
-  private Xcode601.Device device6;
+  private XcodeDevice deviceTmp;
   private final IOSLogManager logManager;
   private Response capabilityCachedResponse;
   private boolean decorated = false;
@@ -85,8 +90,8 @@ public class ServerSideSession extends Session {
     }
   }
 
-  public Xcode601.Device getDevice6() {
-    return device6;
+  public XcodeDevice getDeviceTmp() {
+    return deviceTmp;
   }
 
 
@@ -255,12 +260,11 @@ public class ServerSideSession extends Session {
           capabilities.getDevice(), sdkVersion));
     }
 
-    DeviceUUIDsMap map = getIOSServerManager().getHostInfo().getDeviceUUIDMap();
+    DeviceMapping map = getIOSServerManager().getHostInfo().getDeviceUUIDMap();
 
-    Xcode601.Runtime rt = map.getRuntime(capabilities.getSDKVersion());
-//    Xcode601.DeviceType type = map.getDeviceType("iPhone 4s");
-    Xcode601.DeviceType type = map.getDeviceType(DeviceVariation.deviceString(DeviceType.iphone,capabilities.getDeviceVariation(),6));
-    this.device6 = map.getDevice(rt,type);
+    XcodeRuntime rt = map.getRuntime(capabilities.getSDKVersion());
+    XcodeDeviceType type = map.getDeviceType(capabilities.getDeviceVariation());
+    this.deviceTmp = map.getDevice(rt,type);
 
   }
 
