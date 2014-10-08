@@ -68,6 +68,7 @@ public class WebKitNotificationListener implements MessageListener {
     }
 
     if (message instanceof ApplicationSentListingMessage) {
+
       ApplicationSentListingMessage m = (ApplicationSentListingMessage) message;
 
       List<WebkitPage> messagePages = m.getPages();
@@ -145,11 +146,16 @@ public class WebKitNotificationListener implements MessageListener {
           for (WebkitPage p : old) {
             log.fine(
                 "the page " + p + " has been deleted and must be removed from the driver cache");
-            int currentFocus = driver.getCurrentPageID();
-            if (p.getPageId() == currentFocus) {
-              log.fine("the page deleted is the one with the focus.");
-            } else {
-              driver.setPages(m.getPages());
+            try {
+              int currentFocus = driver.getCurrentPageID();
+              if (p.getPageId() == currentFocus) {
+                log.fine("the page deleted is the one with the focus.");
+              } else {
+                driver.setPages(m.getPages());
+              }
+
+            }catch (NullPointerException npe){
+              // ignore. driver not initialized yet.
             }
           }
         }

@@ -449,7 +449,7 @@ public class APPIOSApplication {
   public IOSCapabilities getCapabilities() {
     IOSCapabilities cap = new IOSCapabilities();
     cap.setSupportedLanguages(getSupportedLanguagesCodes());
-    cap.setCapability("applicationPath", getApplicationPath().getAbsoluteFile());
+    cap.setCapability(IOSCapabilities.APP_PATH, getApplicationPath().getAbsoluteFile());
     List<DeviceType> supported = getSupportedDevices();
 
     if (supported.contains(DeviceType.iphone)) {
@@ -533,6 +533,18 @@ public class APPIOSApplication {
       throw new SessionNotCreatedException(
           "Language requested, " + l + " ,isn't supported.Supported are : "
           + appCapability.getSupportedLanguages());
+    }
+
+    // for safari, make the SDK it comes from match
+    if ("Safari".equals(desiredCapabilities.getBundleName())) {
+      File s = (File) appCapability.getCapability(IOSCapabilities.APP_PATH);
+      boolean
+          correct =
+          ("safari-" + sdk + ".app").equals(s.getName()) || s.getAbsolutePath()
+              .endsWith("iPhoneSimulator" + sdk + ".sdk/Applications/MobileSafari.app");
+      if (!correct) {
+        return false;
+      }
     }
     return true;
   }

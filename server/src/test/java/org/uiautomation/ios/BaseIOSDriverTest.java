@@ -21,11 +21,14 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.uiautomation.ios.client.uiamodels.impl.RemoteIOSDriver;
+import org.uiautomation.ios.communication.device.DeviceType;
+import org.uiautomation.ios.communication.device.DeviceVariation;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 public abstract class BaseIOSDriverTest {
 
@@ -34,7 +37,7 @@ public abstract class BaseIOSDriverTest {
   protected RemoteIOSDriver driver;
 
   private IOSServer server;
-  private IOSServerConfiguration config;
+  protected IOSServerConfiguration config;
 
   @BeforeClass
   public final void beforeClass() throws Exception {
@@ -46,21 +49,23 @@ public abstract class BaseIOSDriverTest {
       throw ex;
     }
   }
-
+  
   @AfterClass
   public final void afterClass() throws Exception {
-    stopDriver();
+    stopDriver();    
     stopServer();
   }
 
   private void startServer() throws Exception {
     String[] args = {"-port", "4444", "-host", "localhost",
-                     "-aut", SampleApps.getUICatalogFile(),
-                     "-aut", SampleApps.getUICatalogIpad(),
-                     "-aut", SampleApps.getGeocoderFile(),
-                     "-aut", SampleApps.getIntlMountainsFile(),
-                     "-aut", SampleApps.gettestNoContentFile(),
-                     "-aut", SampleApps.getPPNQASampleApp(),
+                     //"-aut", SampleApps.getUICatalogFile(),
+                     //"-aut", SampleApps.getUICatalogIpad(),
+                     //"-aut", SampleApps.getGeocoderFile(),
+                     //"-aut", SampleApps.getIntlMountainsFile(),
+                     //"-aut", SampleApps.gettestNoContentFile(),
+                     //"-aut", SampleApps.getPPNQASampleApp(),
+                     //"-aut","/Users/freynaud/eBay.app",
+                     "-aut","/Users/freynaud/UICatalog_8.app",
                      /*"-beta",*/ "-folder", "applications",
                      "-sessionTimeout", "60",
     };
@@ -75,31 +80,32 @@ public abstract class BaseIOSDriverTest {
       try {
         server.stop();
       } catch (Exception ex) {
-        log.log(Level.SEVERE, "error stopping server", ex);
+        ex.printStackTrace();
       }
       server = null;
     }
   }
 
-  protected final RemoteIOSDriver getDriver(IOSCapabilities cap) {
+  protected final RemoteIOSDriver getDriver(IOSCapabilities cap){
     boolean simulator = true;
-    cap.setCapability(IOSCapabilities.SIMULATOR, simulator);
+    cap.setCapability(IOSCapabilities.SIMULATOR,simulator);
+    //cap.setDeviceVariation(DeviceVariation.iPhone5s);
     driver = new RemoteIOSDriver(getRemoteURL(), cap);
     return driver;
   }
-
+  
   protected final void stopDriver() {
     log.info("stopDriver: " + driver);
     if (driver != null) {
       try {
         driver.quit();
       } catch (Exception ex) {
-        log.log(Level.SEVERE, "error stopping server", ex);
+        ex.printStackTrace();
       }
       driver = null;
     }
   }
-
+  
   protected final URL getRemoteURL() {
     try {
       URL remote = new URL("http://" + config.getHost() + ":" + config.getPort() + "/wd/hub");
@@ -110,9 +116,6 @@ public abstract class BaseIOSDriverTest {
   }
 
   protected final void waitForElement(WebDriver driver, org.openqa.selenium.By by, long timeOut) {
-    WebElement
-        element =
-        (new WebDriverWait(driver, timeOut))
-            .until(ExpectedConditions.visibilityOfElementLocated(by));
+    WebElement element = (new WebDriverWait(driver, timeOut)).until(ExpectedConditions.visibilityOfElementLocated(by));
   }
 }

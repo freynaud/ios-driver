@@ -58,12 +58,18 @@ public class Command {
    * Execute the command, and wait for it to finish. Also wait for stdout and stderr listener to finish processing their streams.
    */
   public int executeAndWait() {
-    return executeAndWait(false);
+    return executeAndWait(false,-1);
   }
 
+
   public int executeAndWait(boolean ignoreErrors) {
+    return executeAndWait(ignoreErrors,-1);
+  }
+
+
+  public int executeAndWait(boolean ignoreErrors,int timeout) {
     start();
-    int exitCode = waitFor(-1);
+    int exitCode = waitFor(timeout);
     if (!ignoreErrors && exitCode != 0) {
       throw new WebDriverException(
           "execution failed. Exit code =" + exitCode + " , command was: " + commandString());
@@ -188,6 +194,7 @@ public class Command {
     if (process != null) {
       process.destroy();
     }
+
     for (Thread t : threads) {
       t.interrupt();
     }
@@ -201,10 +208,10 @@ public class Command {
   public String toString() {
     StringBuilder b = new StringBuilder();
     b.append(commandString());
-    b.append("\n\n");
-    b.append(getStdOut());
-    b.append("\n\n");
-    b.append(getErr());
+    //b.append("\n\n");
+    //b.append(getStdOut());
+    //b.append("\n\n");
+    //b.append(getErr());
 
     return b.toString();
   }

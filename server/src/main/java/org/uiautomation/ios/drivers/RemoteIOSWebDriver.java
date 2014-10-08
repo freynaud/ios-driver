@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RemoteIOSWebDriver {
@@ -90,6 +89,7 @@ public class RemoteIOSWebDriver {
   }
 
   public void start() {
+    log.info("starting WKDP");
     protocol.start();
 
     if (session != null) {
@@ -103,8 +103,25 @@ public class RemoteIOSWebDriver {
     log.fine("connectionKey=" + connectionKey);
 
     if (applications.size() == 1) {
+      log.info("connecting ...");
       connect(applications.get(0).getBundleId());
+      log.info("connected");
+      isStarted = true;
+      return;
     } else {
+      // try to go to the correct one.
+      log.info("try to go to the correct one.");
+      String name = session.getCapabilities().getBundleName();
+      for (WebkitApplication app : applications) {
+        if (!app.getBundleName().equals(name)) {
+          this.bundleId = app.getBundleId();
+          log.info("will connect");
+          connect(app.getBundleId());
+          log.info("has connected");
+          isStarted = true;
+          return;
+        }
+      }
       showWarning();
     }
     isStarted = true;
@@ -127,13 +144,13 @@ public class RemoteIOSWebDriver {
       }
       // Native app
     } else {
-      log.warning("session created but application size=" + applications.size()
-                  + ".Does the app have a webview ?");
+      log.warning("session created but application size=" + applications.size() + ".Does the app have a webview ?");
     }
   }
 
   public void stop() {
     isStarted = false;
+    log.info("stopping WKDP");
     protocol.stop();
   }
 
@@ -171,7 +188,7 @@ public class RemoteIOSWebDriver {
         this.bundleId = bundleId;
         protocol.connect(bundleId);
         sync.waitForSimToSendPages();
-        log.fine("bundleId=" + bundleId);
+        log.info("bundleId=" + bundleId);
         switchTo(Collections.max(getPages()));
         if (getPages().size() > 1) {
           log.warning("Application started, but already have " + getPages().size()
@@ -243,7 +260,13 @@ public class RemoteIOSWebDriver {
   }
 
   public String getCurrentUrl() {
-      return currentInspector.getCurrentUrl();
+    try {
+      return currentInspector
+          .getCurrentUrl();  //To change body of implemented methods use File | Settings | File Templates.
+    } catch (Exception e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      return null;
+    }
   }
 
   public String getTitle() {
@@ -284,6 +307,7 @@ public class RemoteIOSWebDriver {
 
   public void quit() {
     stop();
+    //To change body of implemented methods use File | Settings | File Templates.
   }
 
   public List<WebkitPage> getWindowHandles() {
@@ -341,7 +365,7 @@ public class RemoteIOSWebDriver {
     try {
       currentInspector.forward();
     } catch (Exception e) {
-      log.log(Level.SEVERE,"forward error",e);
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
   }
 
@@ -349,7 +373,7 @@ public class RemoteIOSWebDriver {
     try {
       currentInspector.refresh();
     } catch (Exception e) {
-      log.log(Level.SEVERE,"refresh error",e);
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
   }
 

@@ -48,8 +48,10 @@ public class IOSSafariSimulatorManager extends IOSSimulatorManager {
 
 
   @Override
-  public void setup(){
-    copySafariToAllowInstallByInstruments();
+  public void setup() {
+    if (!new IOSVersion(desiredSDKVersion).isGreaterOrEqualTo("8.0")) {
+      copySafariToAllowInstallByInstruments();
+    }
     setFavorite();
 
     super.setup();
@@ -58,19 +60,18 @@ public class IOSSafariSimulatorManager extends IOSSimulatorManager {
   }
 
 
-  public void tmpFix(){
+  public void tmpFix() {
     putMobileSafariAppBackInInstallDir();
   }
 
   @Override
-  public void teardown(){
+  public void teardown() {
     super.teardown();
     putMobileSafariAppBackInInstallDir();
   }
 
 
-
-  private void setFavorite(){
+  private void setFavorite() {
     boolean isSDK70OrHigher = new IOSVersion(session.getCapabilities().getSDKVersion()).isGreaterOrEqualTo(
         "7.0");
     IOSRunningApplication application = session.getApplication();

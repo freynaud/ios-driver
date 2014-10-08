@@ -10,6 +10,7 @@ import org.uiautomation.ios.IOSCapabilities;
 import org.uiautomation.ios.client.uiamodels.impl.RemoteIOSDriver;
 import org.uiautomation.ios.IOSServer;
 import org.uiautomation.ios.IOSServerConfiguration;
+import org.uiautomation.ios.communication.device.DeviceVariation;
 
 public abstract class BaseSeleniumTest {
 
@@ -28,6 +29,7 @@ public abstract class BaseSeleniumTest {
     startTestServer();
     IOSCapabilities safari = IOSCapabilities.iphone("Safari");
     // safari.setLanguage("fr");
+    safari.setDeviceVariation(DeviceVariation.iPhone5s);
     driver = new RemoteIOSDriver(new URL(url), safari);
   }
   

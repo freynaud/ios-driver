@@ -145,7 +145,7 @@ public abstract class BaseWebInspector implements MessageListener, ConnectListen
         if (!e.getMessage().contains("Inspected frame has gone")) {
           throw e;
         }
-        log.severe("current url not ready :" + e.getMessage());
+        log.fine("current url not ready :" + e.getMessage());
       }
     }
     throw new WebDriverException("timeout waiting for the URL to be accessible.");

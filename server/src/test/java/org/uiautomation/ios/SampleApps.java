@@ -13,6 +13,9 @@
  */
 package org.uiautomation.ios;
 
+import org.uiautomation.ios.instruments.InstrumentsVersion;
+import org.uiautomation.ios.utils.ClassicCommands;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,7 +26,7 @@ public class SampleApps {
 
   private static final Logger log = Logger.getLogger(SampleApps.class.getName());
 
-  private static final String uiCatalog = "/sampleApps/UICatalog.app";
+  private static final String uiCatalog = "/sampleApps/UICatalog_8.app";
   private static final String uiCatalogZip = "/sampleApps/UICatalog.zip";
   private static final String uiCatalogiPad = "/sampleApps/UICatalogiPad.app";
   private static final String intlMountains = "/sampleApps/InternationalMountains.app";
@@ -33,6 +36,9 @@ public class SampleApps {
 
   private static final String sdkVersion = System.getProperty("SDK", null);
 
+  static {
+    InstrumentsVersion v = ClassicCommands.getInstrumentsVersion();
+  }
 
   private static File getFromClassPath(String resource) {
     URL url = SampleApps.class.getResource(resource);
@@ -56,11 +62,13 @@ public class SampleApps {
   }
 
   public static String getUICatalogFile() {
-    return getFromClassPath(uiCatalog).getAbsolutePath();
+
+      return getFromClassPath(uiCatalog).getAbsolutePath();
+
   }
-  
+
   public static URL getUICatalogZipURL() throws MalformedURLException {
-    String s =  "file://" + getFromClassPath(uiCatalogZip).getAbsolutePath();
+    String s = "file://" + getFromClassPath(uiCatalogZip).getAbsolutePath();
     return new URL(s);
   }
 
@@ -88,7 +96,12 @@ public class SampleApps {
   }
 
   public static IOSCapabilities uiCatalogCap() {
-    IOSCapabilities c = IOSCapabilities.iphone("UICatalog", "2.10");
+
+    String version = "2.10";
+    if (ClassicCommands.getXCodeVersion().isGreaterOrEqualTo("6")) {
+      version = "1.0";
+    }
+    IOSCapabilities c = IOSCapabilities.iphone("UICatalog", version);
     if (sdkVersion != null) {
       log.info("SET SDK to " + sdkVersion);
       c.setSDKVersion(sdkVersion);

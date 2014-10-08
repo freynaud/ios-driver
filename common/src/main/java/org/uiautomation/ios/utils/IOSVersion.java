@@ -79,4 +79,9 @@ public class IOSVersion {
   public String getIncremental() {
     return incremental;
   }
+
+  @Override
+  public String toString(){
+    return  major+"."+minor+"."+incremental;
+  }
 }

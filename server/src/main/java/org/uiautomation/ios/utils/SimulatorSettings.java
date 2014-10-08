@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebDriverException;
+import org.uiautomation.ios.ServerSideSession;
 import org.uiautomation.ios.communication.device.DeviceType;
 import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.HostInfo;
@@ -49,16 +50,18 @@ public class SimulatorSettings {
   private final File contentAndSettingsFolder;
   private final File globalPreferencePlist;
   private final HostInfo info;
+  private final ServerSideSession session;
   private String deviceName;
 
   private InstrumentsVersion instrumentsVersion;
 
-  public SimulatorSettings(HostInfo info, String sdkVersion, boolean is64bit) {
+  public SimulatorSettings(HostInfo info, String sdkVersion, boolean is64bit, ServerSideSession session) {
     this.exactSdkVersion = sdkVersion;
     this.is64bit = is64bit;
     this.info = info;
     this.contentAndSettingsFolder = getContentAndSettingsFolder();
     this.globalPreferencePlist = getGlobalPreferenceFile();
+    this.session =session;
   }
 
   public void setLocationPreference(boolean authorized, String bundleId) {
@@ -209,20 +212,11 @@ public class SimulatorSettings {
         System.err.println("couldn't re-create: " + contentAndSettingsFolder);
       }
     } else {
-      // Starting with Xcode 6 and later, we can use simctl to do the hard work for us.
-      DeviceUUIDsMap uuidsMap = new DeviceUUIDsMap();
-      uuidsMap.loadData();
-      String uuid = uuidsMap.getUUID(exactSdkVersion, deviceName);
-      if (uuid == null) {
-        System.err.println("Unable to get UUID for device " + deviceName + " with SDK " + exactSdkVersion);
-      }
-      List<String> simctlArgs = new ArrayList<>();
-      simctlArgs.add("xcrun");
-      simctlArgs.add("simctl");
-      simctlArgs.add("erase");
-      simctlArgs.add(uuid);
-      Command simctlCmd = new Command(simctlArgs, true);
-      simctlCmd.executeAndWait();
+      String uuid=session.getDevice6().getUuid();
+      log.info("Reset content and settings");
+      ClassicCommands.eraseSimByUUID(uuid);
+
+
     }
   }
 
@@ -306,7 +300,7 @@ public class SimulatorSettings {
       throws IOException, JSONException {
     if (destination.exists()) {
       // This is possible if we start with capability "reuseContentAndSettings"
-      log.info(destination + " already exists. Overwriting data");
+      log.fine(destination + " already exists. Overwriting data");
     }
 
     // make sure the folder is ready for the plist file

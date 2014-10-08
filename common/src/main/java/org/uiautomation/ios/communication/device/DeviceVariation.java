@@ -36,11 +36,10 @@ public enum DeviceVariation {
   iPadRetina,
   iPadRetina_64bit,
 
+
+  // ios8 ones
   ResizableiPad,
   ResizableiPhone,
-
-  // Even newer names. These are mostly non-equivalent to earlier names although it is how they are described by the
-  // instruments shipped with Xcode6.
 
   iPad2,
   iPadAir,
@@ -48,53 +47,51 @@ public enum DeviceVariation {
   iPhone4s,
   iPhone5,
   iPhone5s,
-  iPhone6,
-  iPhone6Plus,
-  ;
+  iPhone6Plus, iPhone6;
 
   public static DeviceVariation normalize(DeviceType deviceType, DeviceVariation deviceVariation,
-                                          int instrumentsMajorVersion) {
-    if (instrumentsMajorVersion >= 6) {
+    int instrumentsMajorVersion) {
+      if (instrumentsMajorVersion >= 6) {
+        switch (deviceVariation) {
+          case iPhone:
+          case iPhoneRetina:
+            return iPhone4s;
+          case iPhoneRetina_4inch:
+            return iPhone5;
+          case iPhoneRetina_4inch_64bit:
+            return iPhone5s;
+          case iPad:
+            return iPad2;
+          case iPadRetina:
+            return iPadRetina;
+          case iPadRetina_64bit:
+            return iPadAir;
+        }
+      }
       switch (deviceVariation) {
-        case iPhone:
-        case iPhoneRetina:
-          return iPhone4s;
-        case iPhoneRetina_4inch:
-          return iPhone5;
-        case iPhoneRetina_4inch_64bit:
-          return iPhone5s;
-        case iPad:
-          return iPad2;
-        case iPadRetina:
+        case Regular:
+          switch (deviceType) {
+            case iphone:
+              return iPhone;
+            case ipad:
+              return iPad;
+          }
+        case Retina35:
+          return iPhoneRetina;
+        case Retina4:
+          return iPhoneRetina_4inch;
+        case Retina:
           return iPadRetina;
-        case iPadRetina_64bit:
-          return iPadAir;
+        case iPad25:
+          return iPad;
+        default:
+          return deviceVariation;
       }
     }
-    switch (deviceVariation) {
-      case Regular:
-        switch (deviceType) {
-          case iphone:
-            return iPhone;
-          case ipad:
-            return iPad;
-        }
-      case Retina35:
-        return iPhoneRetina;
-      case Retina4:
-        return iPhoneRetina_4inch;
-      case Retina:
-        return iPadRetina;
-      case iPad25:
-        return iPad;
-      default:
-        return deviceVariation;
-    }
-  }
 
   public static boolean compatibleWithSDKVersion(DeviceType device, DeviceVariation deviceVariation,
                                                  String sdkVersion) {
-    deviceVariation = DeviceVariation.normalize(device, deviceVariation, 0);
+    deviceVariation = DeviceVariation.normalize(device, deviceVariation,0);
     boolean isSdk7OrNewer = (new IOSVersion(sdkVersion)).isGreaterOrEqualTo("7.0");
     switch (device) {
       case iphone:
@@ -119,19 +116,18 @@ public enum DeviceVariation {
       boolean isSdk7OrNewer = (new IOSVersion(sdkVersion)).isGreaterOrEqualTo("7.0");
       switch (device) {
         case iphone:
-          return isSdk7OrNewer? Retina4 : Regular;
+          return isSdk7OrNewer? iPhone5s : Regular;
         case ipad:
-          return isSdk7OrNewer? Retina : Regular;
+          return isSdk7OrNewer? iPad2 : Regular;
       }
       return Regular;
   }
 
-  public static String deviceString(DeviceType deviceType, DeviceVariation deviceVariation,
-                                    int instrumentsMajorVersion) {
+  public static String deviceString(DeviceType deviceType, DeviceVariation deviceVariation,int instrumentsMajorVersion) {
     String result;
     boolean mismatch;
 
-    switch (normalize(deviceType, deviceVariation, instrumentsMajorVersion)) {
+    switch (normalize(deviceType, deviceVariation,instrumentsMajorVersion)) {
       case iPhone:
         result = "iPhone";
         mismatch = (deviceType != DeviceType.iphone);

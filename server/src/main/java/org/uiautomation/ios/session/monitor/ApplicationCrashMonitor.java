@@ -26,6 +26,8 @@ public class ApplicationCrashMonitor implements ServerSideSessionMonitor, Comman
   private static final Logger log = Logger.getLogger(ApplicationCrashMonitor.class.getName());
   private final String APP_DIED = "The target application appears to have died";
   private final String STOP_BY_USER = "Script was stopped by the user";
+  private final String APP_DIED_6 = "Target failed to run: The operation couldn’t be completed.";
+  private final String INSTRUMENTS_COMPLAINS = "Instruments Usage Error";
 
 
   public ApplicationCrashMonitor(ServerSideSession session) {
@@ -42,9 +44,9 @@ public class ApplicationCrashMonitor implements ServerSideSessionMonitor, Comman
     hasApplicationCrashed(output);
   }
 
-  private void hasApplicationCrashed(String output) {
-    if (output.contains(APP_DIED) || output.contains(STOP_BY_USER)) {
-      log.warning("log from crash " + output);
+  private void hasApplicationCrashed(String o) {
+    if (o.contains(APP_DIED) || o.contains(STOP_BY_USER) || o.contains(APP_DIED_6) || o.contains(INSTRUMENTS_COMPLAINS)) {
+      log.warning("log from crash " + o);
       session.stop(ServerSideSession.StopCause.crash);
     }
   }

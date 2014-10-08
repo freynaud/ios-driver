@@ -14,7 +14,8 @@
 
 package org.uiautomation.ios;
 
-import com.google.common.base.Throwables;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 import com.beust.jcommander.JCommander;
 
@@ -47,7 +48,6 @@ import org.uiautomation.ios.servlet.ServerManagerServlet;
 import org.uiautomation.ios.servlet.StaticResourceServlet;
 import org.uiautomation.ios.utils.BuildInfo;
 import org.uiautomation.ios.utils.FolderMonitor;
-import org.uiautomation.ios.utils.IOSVersion;
 import org.uiautomation.ios.utils.ZipUtils;
 
 import java.io.File;
@@ -95,7 +95,7 @@ public class IOSServer {
             server.getDriver().stop();
           }
         } catch (Exception e) {
-         log.log(Level.SEVERE,"error in shutdown hook",e);
+          log.log(Level.SEVERE, "error in shutdown hook", e);
         }
       }
     });
@@ -103,11 +103,10 @@ public class IOSServer {
     try {
       server.start();
     } catch (Exception e) {
-      log.log(Level.SEVERE, "cannot start ios-driver server.",e);
+      log.log(Level.SEVERE, "cannot start ios-driver server.", e);
       Runtime.getRuntime().exit(1);
     }
   }
-
 
 
   private void init() {
@@ -178,28 +177,21 @@ public class IOSServer {
   }
 
   private void addSimulatorDetails() {
-    File xcodeInstall = driver.getHostInfo().getXCodeInstall();
     String hostSDK = driver.getHostInfo().getSDK();
     p(String.format("Using Xcode install: %s",
                     driver.getHostInfo().getXCodeInstall().getPath()));
     p(String.format("Using instruments: %s", driver.getHostInfo().getInstrumentsVersion()));
     p(String.format("Using iOS version %s", hostSDK));
 
-    boolean safari = false;
-    // automatically add safari for host SDK and above as instruments starts simulator on host SDK version
     for (String s : driver.getHostInfo().getInstalledSDKs()) {
-      IOSVersion version = new IOSVersion(s);
-      if (version.isGreaterOrEqualTo("6.0")) {
-        safari = true;
-        driver.addSupportedApplication(MobileSafariLocator.locateSafariInstall(s));
-      }
-    }
-    if (safari) {
-      p("iOS >= 6.0. Safari and hybrid apps are supported.");
-    } else {
-      p("iOS < 6.0. Safari and hybrid apps are NOT supported.");
+      APPIOSApplication safari = MobileSafariLocator.locateSafariInstall(s);
+      driver.updateSafariMapping(safari.getBundleVersion(),s);
+      driver.addSupportedApplication(safari);
     }
   }
+
+
+
 
   private void initServer() {
     String host = System.getProperty("ios-driver.host");

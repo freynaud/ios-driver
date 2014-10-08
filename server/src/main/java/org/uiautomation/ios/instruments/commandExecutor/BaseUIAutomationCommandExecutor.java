@@ -67,7 +67,21 @@ public abstract class BaseUIAutomationCommandExecutor implements UIAutomationCom
       if (ready) {
         return true;
       }
-      return condition.await(timeOut, TimeUnit.SECONDS);
+      long deadline = System.currentTimeMillis()+(timeOut*1000);
+      while (System.currentTimeMillis() < deadline){
+        if (session.getSessionState() == ServerSideSession.SessionState.stopped) {
+          System.out.println("crash detected in waitForUIScriptToBeStarted");
+          return false;
+        }
+        try {
+          condition.await(1, TimeUnit.SECONDS);
+          if (ready) {
+            return true;
+          }
+        }catch (Exception e){
+        }
+      }
+      return false;
     } finally {
       lock.unlock();
     }

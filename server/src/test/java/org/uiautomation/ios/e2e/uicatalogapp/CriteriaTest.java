@@ -14,6 +14,7 @@
 
 package org.uiautomation.ios.e2e.uicatalogapp;
 
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -29,15 +30,33 @@ import org.uiautomation.ios.UIAModels.predicate.MatchingStrategy;
 import org.uiautomation.ios.UIAModels.predicate.NameCriteria;
 import org.uiautomation.ios.UIAModels.predicate.PropertyEqualCriteria;
 import org.uiautomation.ios.UIAModels.predicate.TypeCriteria;
+import org.uiautomation.ios.utils.ClassicCommands;
 
 public class CriteriaTest extends BaseIOSDriverTest {
 
   @BeforeClass
   public void startDriver() throws InterruptedException {
     driver = getDriver(SampleApps.uiCatalogCap());
+    if (pre != null) {
+      driver.findElement(pre).click();
+    }
   }
 
-  private static final String buttonName = "Buttons, Various uses of UIButton";
+  private static String buttonName;
+  private static String regex;
+  private static By pre;
+
+  static {
+    if (ClassicCommands.getXCodeVersion().isGreaterOrEqualTo("6")) {
+      buttonName = "Buttons";
+      regex = "Butt[a-z]*";
+      pre = By.xpath("//UIAButton[@name='UICatalog']");
+    } else {
+      buttonName = "Buttons, Various uses of UIButton";
+      regex = "Buttons, V[a-z]* uses of UIButton";
+    }
+  }
+
 
   @Test
   public void exactMatch() {
@@ -51,7 +70,6 @@ public class CriteriaTest extends BaseIOSDriverTest {
 
   @Test
   public void regexMatch() throws InterruptedException {
-    String regex = "Buttons, V[a-z]* uses of UIButton";
     Criteria c1 = new TypeCriteria(UIATableCell.class);
     PropertyEqualCriteria c2 = new NameCriteria(regex, MatchingStrategy.regex);
     Criteria c = new AndCriteria(c1, c2);

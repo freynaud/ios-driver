@@ -15,6 +15,11 @@ public class ChildrenFindingTest extends BaseSeleniumTest {
 
 
   @Test
+  public void test() {
+    driver.get(pages.simpleTestPage);
+  }
+
+  @Test
   public void testFindElementByXPath() {
     driver.get(pages.nestedPage);
     WebElement element = driver.findElement(By.name("form2"));

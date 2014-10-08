@@ -27,6 +27,7 @@ import org.uiautomation.ios.application.NoSuchLocaleException;
 import org.uiautomation.ios.command.configuration.Configuration;
 import org.uiautomation.ios.command.configuration.DriverConfigurationStore;
 import org.uiautomation.ios.communication.WebDriverLikeCommand;
+import org.uiautomation.ios.communication.device.DeviceType;
 import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.drivers.IOSDualDriver;
 import org.uiautomation.ios.instruments.InstrumentsFailedToStartException;
@@ -36,8 +37,9 @@ import org.uiautomation.ios.session.monitor.MaxTimeBetween2CommandsMonitor;
 import org.uiautomation.ios.session.monitor.ServerSideSessionMonitor;
 import org.uiautomation.ios.session.monitor.SessionTimeoutMonitor;
 import org.uiautomation.ios.utils.ClassicCommands;
-import org.uiautomation.ios.utils.IOSVersion;
+import org.uiautomation.ios.utils.DeviceUUIDsMap;
 import org.uiautomation.ios.utils.ZipUtils;
+import org.uiautomation.ios.xcode.Xcode601;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -61,6 +63,7 @@ public class ServerSideSession extends Session {
   private final DriverConfiguration configuration;
   private IOSRunningApplication application;
   private Device device;
+  private Xcode601.Device device6;
   private final IOSLogManager logManager;
   private Response capabilityCachedResponse;
   private boolean decorated = false;
@@ -82,6 +85,10 @@ public class ServerSideSession extends Session {
     }
   }
 
+  public Xcode601.Device getDevice6() {
+    return device6;
+  }
+
 
   public static enum SessionState {
     created, running, stopped;
@@ -101,12 +108,14 @@ public class ServerSideSession extends Session {
     try {
       logManager = new IOSLogManager(capabilities.getLoggingPreferences());
     } catch (Exception ex) {
-      log.log(Level.SEVERE,"log manager error",ex);
+      log.log(Level.SEVERE, "log manager error", ex);
       throw new SessionNotCreatedException("Cannot create logManager", ex);
     }
 
     ensureLanguage();
     ensureLocale();
+
+    updateCapabilitiesWithSensibleDefaults();
 
     try {
       device = server.findAndReserveMatchingDevice(desiredCapabilities);
@@ -119,7 +128,7 @@ public class ServerSideSession extends Session {
         application = server.findAndCreateInstanceMatchingApplication(desiredCapabilities);
       }
 
-      updateCapabilitiesWithSensibleDefaults();
+      capabilities.setBundleId(application.getBundleId());
 
       driver = new IOSDualDriver(this);
       configuration = new DriverConfigurationStore();
@@ -215,17 +224,19 @@ public class ServerSideSession extends Session {
 
   private void updateCapabilitiesWithSensibleDefaults() {
     // update capabilities and put default values in the missing fields.
-    capabilities.setBundleId(application.getBundleId());
+
     // TODO device.getSDK()
     if (capabilities.getSDKVersion() == null) {
-      capabilities.setSDKVersion(ClassicCommands.getDefaultSDK());
+      String sdk;
+      if (capabilities.isSafari() && capabilities.getBundleVersion() != null) {
+        sdk = getIOSServerManager().getSDKForVersion(capabilities.getBundleVersion());
+      } else {
+        sdk = ClassicCommands.getDefaultSDK();
+      }
+      capabilities.setSDKVersion(sdk);
     } else {
       String version = capabilities.getSDKVersion();
 
-      if (!new IOSVersion(version).isGreaterOrEqualTo("5.0")) {
-        throw new SessionNotCreatedException(
-            version + " is too old. Only support SDK 5.0 and above.");
-      }
       if (capabilities.isSimulator()) {
         if (!server.getHostInfo().getInstalledSDKs().contains(version)) {
           throw new SessionNotCreatedException(
@@ -234,11 +245,45 @@ public class ServerSideSession extends Session {
         }
       }
     }
+
+    handleSafariVersion();
+
     if (capabilities.getDeviceVariation() == null) {
       // use a variation that matches the SDK, Regular wouldn't work for iOS 7
       String sdkVersion = capabilities.getSDKVersion();
       capabilities.setDeviceVariation(DeviceVariation.getCompatibleVersion(
           capabilities.getDevice(), sdkVersion));
+    }
+
+    DeviceUUIDsMap map = getIOSServerManager().getHostInfo().getDeviceUUIDMap();
+
+    Xcode601.Runtime rt = map.getRuntime(capabilities.getSDKVersion());
+//    Xcode601.DeviceType type = map.getDeviceType("iPhone 4s");
+    Xcode601.DeviceType type = map.getDeviceType(DeviceVariation.deviceString(DeviceType.iphone,capabilities.getDeviceVariation(),6));
+    this.device6 = map.getDevice(rt,type);
+
+  }
+
+
+  private void handleSafariVersion() {
+    if (!"Safari".equals(capabilities.getBundleName())) {
+      return;
+    }
+
+    String sdkVersion = capabilities.getSDKVersion();
+    String version = capabilities.getBundleVersion();
+
+    String requiredVersion = getIOSServerManager().getVersionForSDK(sdkVersion);
+    if (requiredVersion == null) {
+      throw new WebDriverException("No safari for sdk" + sdkVersion);
+    }
+
+    if (version != null && !requiredVersion.equals(version)) {
+      throw new WebDriverException("Cannot launch safari " + version + " on SDK" + sdkVersion + ". Need version=" + requiredVersion);
+    }
+
+    if (version == null) {
+      capabilities.setCapability(IOSCapabilities.BUNDLE_VERSION, requiredVersion);
     }
   }
 

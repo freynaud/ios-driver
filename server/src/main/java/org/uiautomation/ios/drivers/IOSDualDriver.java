@@ -32,6 +32,7 @@ import org.uiautomation.ios.setup.IOSSafariSimulatorManager;
 import org.uiautomation.ios.utils.IOSVersion;
 import org.uiautomation.ios.wkrdp.WebKitRemoteDebugProtocolFactory;
 import org.uiautomation.ios.wkrdp.internal.WebKitRemoteDebugProtocol;
+import org.uiautomation.ios.xcode.XcodeFactory;
 
 import java.net.URL;
 import java.util.Timer;
@@ -100,7 +101,7 @@ public class IOSDualDriver {
     try {
       deviceManager.teardown();
     } catch (Exception e) {
-      log.log(Level.WARNING,"device manager didn't stop properly",e);
+      log.log(Level.WARNING, "device manager didn't stop properly", e);
     }
     if (webDriver != null) {
       try {
@@ -133,8 +134,9 @@ public class IOSDualDriver {
 
     if (session.getApplication().isSafari()) {
       setMode(WorkingMode.Web);
-      getRemoteWebDriver().get("about:blank");
+      getRemoteWebDriver(); //.get("about:blank");
 
+      log.info("remote web driver created");
       String sdkVersion = session.getCapabilities().getSDKVersion();
       IOSVersion version = new IOSVersion(sdkVersion);
       if (sdkVersion != null && version.isGreaterOrEqualTo("7.0")) {
@@ -151,6 +153,17 @@ public class IOSDualDriver {
    */
   private void forceWebViewToReloadManually(int retry) {
 
+    if (1 == 1) {
+      XcodeFactory.create().openURL(session.getDevice6().getUuid(), "http://about:blank");
+      log.info("got current url");
+      try {
+        String url = getRemoteWebDriver().getCurrentUrl();
+        log.info("url at startup=" + url);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      return;
+    }
     boolean ok = false;
     setMode(WorkingMode.Native);
     for (int i = 0; i < retry; i++) {
@@ -199,7 +212,7 @@ public class IOSDualDriver {
     if (!webDriver.isStarted()) {
       String version = session.getCapabilities().getSDKVersion();
       if (new IOSVersion(version).isGreaterOrEqualTo("6.0")) {
-        webDriver.start();
+        safeStart();
       } else {
         log.warning("Cannot create a driver. Version too old " + version);
       }
@@ -207,9 +220,22 @@ public class IOSDualDriver {
     return webDriver;
   }
 
+  private void safeStart() {
+    try {
+      log.info("starting webdriver");
+      webDriver.start();
+    } catch (Exception e) {
+      log.info("starting webdriver failed.Retrying.");
+      restartWebkit();
+      log.info("Retrying worked");
+
+
+    }
+  }
+
   public void setMode(WorkingMode mode) throws NoSuchWindowException {
-    if (mode == this.mode){
-        return;
+    if (mode == this.mode) {
+      return;
     }
 
     if (mode == WorkingMode.Web) {
@@ -224,9 +250,9 @@ public class IOSDualDriver {
     }
 
     try {
-        getNativeDriver().findElement(By.className("UIAWebView"));
+      getNativeDriver().findElement(By.className("UIAWebView"));
     } catch (NoSuchElementException e) {
-        throw new NoSuchWindowException("The app currently doesn't have a webview displayed.");
+      throw new NoSuchWindowException("The app currently doesn't have a webview displayed.");
     }
   }
 
@@ -235,7 +261,13 @@ public class IOSDualDriver {
   }
 
   public void restartWebkit() {
-    int currentPageID = webDriver.getCurrentPageID();
+
+    int currentPageID = 1;
+    try {
+      currentPageID = webDriver.getCurrentPageID();
+    }catch (Exception e){
+      // ignore.
+    }
     webDriver.stop();
     WebKitRemoteDebugProtocol p = WebKitRemoteDebugProtocolFactory.create(session, nativeDriver);
     webDriver = new RemoteIOSWebDriver(session, p);

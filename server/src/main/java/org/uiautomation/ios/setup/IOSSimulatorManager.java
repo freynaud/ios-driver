@@ -63,7 +63,7 @@ public class IOSSimulatorManager implements IOSDeviceManager {
 
     xcodeInstall = ClassicCommands.getXCodeInstall();
     boolean is64bit = DeviceVariation.is64bit(caps.getDeviceVariation());
-    simulatorSettings = new SimulatorSettings(info, desiredSDKVersion, is64bit);
+    simulatorSettings = new SimulatorSettings(info, desiredSDKVersion, is64bit,session);
     bundleId = caps.getBundleId();
   }
 
@@ -81,7 +81,7 @@ public class IOSSimulatorManager implements IOSDeviceManager {
     boolean putDefaultFirst = instrumentsIs50OrHigher;
 
     simulatorSettings.setInstrumentsVersion(info.getInstrumentsVersion());
-    simulatorSettings.setVariation(deviceType, variation, desiredSDKVersion);
+    //simulatorSettings.setVariation(deviceType, variation, desiredSDKVersion);
     simulatorSettings.setInstrumentsVersion(info.getInstrumentsVersion());
     simulatorSettings.setSimulatorScale(caps.getSimulatorScale());
 

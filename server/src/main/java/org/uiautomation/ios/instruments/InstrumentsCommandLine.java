@@ -20,14 +20,13 @@ import org.uiautomation.ios.Device;
 import org.uiautomation.ios.IOSCapabilities;
 import org.uiautomation.ios.RealDevice;
 import org.uiautomation.ios.ServerSideSession;
+import org.uiautomation.ios.SessionNotInitializedException;
 import org.uiautomation.ios.application.IOSRunningApplication;
 import org.uiautomation.ios.command.UIAScriptRequest;
 import org.uiautomation.ios.command.UIAScriptResponse;
 import org.uiautomation.ios.command.uiautomation.StopInstrumentsRunLoop;
 import org.uiautomation.ios.instruments.commandExecutor.CURLIAutomationCommandExecutor;
 import org.uiautomation.ios.instruments.commandExecutor.UIAutomationCommandExecutor;
-import org.uiautomation.ios.session.monitor.ApplicationCrashMonitor;
-import org.uiautomation.ios.utils.AppleMagicString;
 import org.uiautomation.ios.utils.ClassicCommands;
 import org.uiautomation.ios.utils.Command;
 import org.uiautomation.ios.utils.CommandOutputListener;
@@ -65,7 +64,7 @@ public class InstrumentsCommandLine implements Instruments {
     if (device instanceof RealDevice) {
       uuid = ((RealDevice) device).getUuid();
     } else {
-      uuid = null;
+      uuid = session.getCapabilities().getDeviceUUID();
     }
     this.caps = session.getCapabilities();
     this.version = session.getIOSServerManager().getHostInfo().getInstrumentsVersion();
@@ -92,26 +91,41 @@ public class InstrumentsCommandLine implements Instruments {
     screenshotService = new InstrumentsAppleScreenshotService(this, sessionId);
   }
 
-
   @Override
   public void start(long timeout) throws InstrumentsFailedToStartException {
     boolean success = false;
     try {
+      log.info(instruments.toString());
       instruments.start();
       // for the no delay instruments, the command launches a script that in turn launches instruments.
       // need to keep the pid of intruments itself to be able to kill it.
 
       // let the process spawn
-      Thread.sleep(2000);
+      Thread.sleep(5000);
       instrumentsPid = ClassicCommands.getHighestPidForName("instruments");
+      if (instrumentsPid != -1) {
+        log.fine("waiting for registration request");
+        success = channel.waitForUIScriptToBeStarted(timeout);
+        synchronized (this) {
+          properlyStarted = success;
+        }
+        log.fine("registration request received" + session.getCachedCapabilityResponse());
+      } else {
+        log.warning("instruments crashed. Waiting before retrying");
+        try {
+          String uuid = session.getDevice6().getUuid();
+          log.warning("trying to shutdown " + uuid);
+          ClassicCommands.shutdownByUUid(uuid);
+          log.info("Killing Sim");
+          ClassicCommands.killall("iOS Simulator");
+          log.warning("shutdown done");
+        } catch (Exception e) {
+          log.warning("couldn't shutdown " + e.getMessage());
 
-      log.fine("waiting for registration request");
-      log.warning("starting to wait");
-      success = channel.waitForUIScriptToBeStarted(timeout);
-      synchronized (this) {
-        properlyStarted = success;
+        }
+        throw new SessionNotInitializedException("instruments crashed right away.");
       }
-      log.fine("registration request received" + session.getCachedCapabilityResponse());
+
       if (!success) {
         log.warning("instruments crashed (" + timeout + " sec)".toUpperCase());
         throw new InstrumentsFailedToStartException(
@@ -162,10 +176,11 @@ public class InstrumentsCommandLine implements Instruments {
       }
     }
     instruments.forceStop();
+
     try {
       ClassicCommands.kill(instrumentsPid);
     } catch (Exception e) {
-        log.warning("couldn't kill " + instrumentsPid);
+      log.warning("couldn't kill " + instrumentsPid);
     }
   }
 
@@ -177,11 +192,11 @@ public class InstrumentsCommandLine implements Instruments {
     if (uuid != null) {
       args.add("-w");
       args.add(uuid);
-    } else if (application.isSimulator() && Double.parseDouble(version.getBuild()) >= 55044) {
-      // newer instruments require to specify the simulator SDK and device type
+    } else if (application.isSimulator()) {
       args.add("-w");
-      args.add(AppleMagicString.getDeviceSpecification(caps.getDevice(), caps.getDeviceVariation(),
-                                                       desiredSDKVersion, version));
+//      args.add(AppleMagicString.getDeviceSpecification(caps.getDevice(), caps.getDeviceVariation(),
+//                                                       desiredSDKVersion, version));
+      args.add(session.getDevice6().getKey());
     }
     args.add("-t");
     args.add(template.getAbsolutePath());
@@ -241,9 +256,9 @@ public class InstrumentsCommandLine implements Instruments {
 
   @Override
   public void registerOutputListener(CommandOutputListener listener) {
-    if (instruments!=null){
+    if (instruments != null) {
       instruments.registerListener(listener);
-    }else{
+    } else {
       log.warning("trying to register an output listener on instruments, but instruments is null, not created yet.");
     }
   }

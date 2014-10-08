@@ -259,6 +259,7 @@ public class ExecuteNativeScriptsTest extends BaseIOSDriverTest {
     assertEquals(res, "UIATableCell");
   }
 
+
   @Test
   public void testPassingArrayAsOnlyArgumentFlattensArray() {
     Object[] array = new Object[]{"zero", 1, true, 3.14159, false};

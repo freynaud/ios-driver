@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ClassicCommands {
 
@@ -63,7 +65,7 @@ public class ClassicCommands {
     try {
       return psgrep(processName).size() > 0;
     } catch (Exception e) {
-      log.log(Level.WARNING,"isRunning?",e);
+      log.log(Level.WARNING, "isRunning?", e);
       return false;
     }
   }
@@ -114,13 +116,12 @@ public class ClassicCommands {
     String path;
     if (res.size() != 0) {
       path = res.get(0);
-    }
-    else {
+    } else {
       // on Xcode 6 and newer, 'instruments -s' lists the names of the templates, not their locations.
       // so if it didn't tell us where the template is, search for it ourselves.
       List<String> findResults = findAutomationTemplate(templateName);
       if (findResults.size() == 0) {
-          throw new WebDriverException("Unable to find the instruments template " + templateName);
+        throw new WebDriverException("Unable to find the instruments template " + templateName);
       }
       path = findResults.get(0);
     }
@@ -134,22 +135,22 @@ public class ClassicCommands {
     return f;
   }
 
-    private static List<String> findAutomationTemplate(String templateName) {
-        List<String> findArguments = new ArrayList<>();
-        File xcodeLocation = getXCodeInstall();
-        findArguments.add("find");
-        findArguments.add(xcodeLocation.getAbsolutePath());
-        findArguments.add("-name");
-        findArguments.add(templateName);
-        Command findCommand = new Command(findArguments, false);
-        Grep automationTemplateMatcher = new Grep(templateName);
-        findCommand.registerListener(automationTemplateMatcher);
-        findCommand.executeAndWait();
-        List<String> findResults = automationTemplateMatcher.getMatching();
-        return findResults;
-    }
+  private static List<String> findAutomationTemplate(String templateName) {
+    List<String> findArguments = new ArrayList<>();
+    File xcodeLocation = getXCodeInstall();
+    findArguments.add("find");
+    findArguments.add(xcodeLocation.getAbsolutePath());
+    findArguments.add("-name");
+    findArguments.add(templateName);
+    Command findCommand = new Command(findArguments, false);
+    Grep automationTemplateMatcher = new Grep(templateName);
+    findCommand.registerListener(automationTemplateMatcher);
+    findCommand.executeAndWait();
+    List<String> findResults = automationTemplateMatcher.getMatching();
+    return findResults;
+  }
 
-    private static List<String> installedSDKs;
+  private static List<String> installedSDKs;
 
   public synchronized static List<String> getInstalledSDKs() {
     if (installedSDKs == null) {
@@ -236,6 +237,68 @@ public class ClassicCommands {
   }
 
 
+  public static IOSVersion getXCodeVersion() {
+    List<String> args = new ArrayList<>();
+    args.add("xcodebuild");
+    args.add("-version");
+    Command c = new Command(args, false);
+    final IOSVersion[] res = new IOSVersion[1];
+    c.registerListener(new CommandOutputListener() {
+
+      private final Pattern sectionPattern = Pattern.compile("Xcode (.*)");
+
+      @Override
+      public void stdout(String log) {
+        Matcher m = sectionPattern.matcher(log);
+        if (m.matches()) {
+          res[0] = new IOSVersion(m.group(1));
+        }
+      }
+
+      @Override
+      public void stderr(String log) {
+      }
+    });
+    c.executeAndWait();
+    return res[0];
+  }
+
+  public static void eraseSimByUUID(String uuid) {
+    List<String> simctlArgs = new ArrayList<>();
+    simctlArgs.add("xcrun");
+    simctlArgs.add("simctl");
+    simctlArgs.add("erase");
+    simctlArgs.add(uuid);
+    Command simctlCmd = new Command(simctlArgs, true);
+    try {
+      simctlCmd.executeAndWait();
+    } catch (Exception e) {
+      log.warning(e.getMessage());
+      log.warning("shuting down");
+      shutdownByUUid(uuid);
+      log.warning("reseting again down");
+      List<String> a = new ArrayList<>();
+      a.add("xcrun");
+      a.add("simctl");
+      a.add("erase");
+      a.add(uuid);
+      Command c = new Command(a, true);
+      c.executeAndWait();
+    }
+  }
+
+  public static void shutdownByUUid(String uuid) {
+    List<String> sh = new ArrayList<>();
+    sh.add("xcrun");
+    sh.add("simctl");
+    sh.add("shutdown");
+    sh.add(uuid);
+    Command shut = new Command(sh, true);
+    int ret = shut.executeAndWait();
+    if (ret != 0) {
+      log.warning("couldn't shutdown " + uuid);
+    }
+  }
 }
 
 class Grep implements CommandOutputListener {

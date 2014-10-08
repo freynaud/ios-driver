@@ -31,11 +31,11 @@ import org.uiautomation.ios.client.uiamodels.impl.RemoteIOSDriver;
 import org.uiautomation.ios.communication.device.DeviceType;
 import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.utils.ClassicCommands;
-import org.uiautomation.ios.utils.IOSVersion;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 import javax.imageio.ImageIO;
 
@@ -167,30 +167,34 @@ public class NewSessionTest extends BaseIOSDriverTest {
     Assert.assertEquals(actual.getSDKVersion(), sdk);
   }
 
-  @Test
-  public void supportAllInstalledSDKs() {
+  @DataProvider(name = "installedSDKs")
+  public Object[][] sdls() {
     List<String> sdks = ClassicCommands.getInstalledSDKs();
-    for (String sdk : sdks) {
+//    Object[][] res = new Object[sdks.size()][1];
+//    for (int i = 0; i < sdks.size(); i++) {
+//      res[i][0] = sdks.get(i);
+//    }
+    Object[][] res = new Object[][]{{"6.0"}};
+    return res;
+  }
 
-      if (new IOSVersion(sdk).isGreaterOrEqualTo("5.0")) {
+  @Test(dataProvider = "installedSDKs")
+  public void supportAllInstalledSDKs(String sdk) {
+    try {
+      IOSCapabilities cap = IOSCapabilities.iphone("InternationalMountains");
+      cap.setSDKVersion(sdk);
+      driver = new RemoteIOSDriver(getRemoteURL(), cap);
+      IOSCapabilities actual = driver.getCapabilities();
 
-        try {
-          IOSCapabilities cap = IOSCapabilities.iphone("InternationalMountains");
-          cap.setSDKVersion(sdk);
-
-          driver = new RemoteIOSDriver(getRemoteURL(), cap);
-          IOSCapabilities actual = driver.getCapabilities();
-
-          Assert.assertEquals(actual.getSDKVersion(), sdk);
-        } finally {
-          if (driver != null) {
-            driver.quit();
-            driver = null;
-          }
-        }
+      Assert.assertEquals(actual.getSDKVersion(), sdk);
+    } finally {
+      if (driver != null) {
+        driver.quit();
+        driver = null;
       }
     }
   }
+
 
   @Test
   public void correctDevice() {

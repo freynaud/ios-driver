@@ -115,8 +115,8 @@ public abstract class WebKitRemoteDebugProtocol {
             "$WIRConnectionIdentifierKey", this.connectionId,
             "$bundleId", bundleId
         );
-    sendSystemCommand(PlistManager.CONNECT_TO_APP, var);
     this.bundleId = bundleId;
+    sendSystemCommand(PlistManager.CONNECT_TO_APP, var);
   }
 
   public void attachToPage(int pageId) {

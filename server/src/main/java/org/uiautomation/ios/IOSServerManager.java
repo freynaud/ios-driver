@@ -23,9 +23,11 @@ import org.uiautomation.ios.application.AppleLanguage;
 import org.uiautomation.ios.application.IOSRunningApplication;
 import org.uiautomation.ios.application.ResourceCache;
 import org.uiautomation.ios.command.configuration.Configuration;
+import org.uiautomation.ios.utils.IOSVersion;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,6 +65,33 @@ public class IOSServerManager {
   public IOSServerConfiguration getConfiguration() {
     return options;
   }
+
+  public void updateSafariMapping(String bundleVersion, String sdk) {
+    sdkToVersion.put(sdk, bundleVersion);
+  }
+
+
+  public String getVersionForSDK(String sdk) {
+    return sdkToVersion.get(sdk);
+  }
+
+  public String getSDKForVersion(String version) {
+    String sdk = null;
+    for (String key : sdkToVersion.keySet()) {
+      if (version.equals(sdkToVersion.get(key))) {
+        if (sdk == null) {
+          sdk = key;
+        } else if (new IOSVersion(key).isGreaterOrEqualTo(sdk)) {
+          sdk = key;
+        }
+      }
+    }
+    return sdk;
+  }
+
+
+  private final Map<String, String> sdkToVersion = new HashMap<>();
+
 
   public static enum State {
     starting, running, stopping, stopped;
@@ -229,6 +258,9 @@ public class IOSServerManager {
   public Device findAndReserveMatchingDevice(IOSCapabilities desiredCapabilities) {
     List<Device> devices = getDeviceStore().getDevices();
     for (Device device : devices) {
+      if (1 == 1) {
+        return device;
+      }
       IOSCapabilities deviceCapabilities = device.getCapability();
       if (Device.canRun(desiredCapabilities, deviceCapabilities)) {
         Device d = device.reserve();

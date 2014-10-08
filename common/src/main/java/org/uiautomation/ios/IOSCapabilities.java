@@ -27,11 +27,17 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.uiautomation.ios.communication.device.DeviceType;
 import org.uiautomation.ios.communication.device.DeviceVariation;
 
-import javax.xml.bind.DatatypeConverter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
+
+import javax.xml.bind.DatatypeConverter;
 
 public class IOSCapabilities extends DesiredCapabilities {
 
@@ -89,7 +95,7 @@ public class IOSCapabilities extends DesiredCapabilities {
   public static final int COMMAND_TIMEOUT_MILLIS = 10 * 60 * 1000; // 10 minutes
   public static final String INSTRUMENTS = "instruments";
   public static final String PROVISIONNED = "provisionnedDevices";
-
+  public static final String APP_PATH = "applicationPath";
 
   // private final Map<String, Object> raw = new HashMap<String, Object>();
 
@@ -248,7 +254,6 @@ public class IOSCapabilities extends DesiredCapabilities {
   }
 
 
-
   public String getLanguage() {
     Object o = getCapability(LANGUAGE);
 
@@ -278,7 +283,7 @@ public class IOSCapabilities extends DesiredCapabilities {
     }
 
     Map<String, byte[]> files = new HashMap<String, byte[]>();
-    for (Iterator<String> pathsIter = o.keys(); pathsIter.hasNext();) {
+    for (Iterator<String> pathsIter = o.keys(); pathsIter.hasNext(); ) {
       String path = pathsIter.next();
       String base64Content;
       try {
@@ -298,7 +303,7 @@ public class IOSCapabilities extends DesiredCapabilities {
 
   private List<String> getList(String key) {
     Object o = getCapability(key);
-    if (o == null){
+    if (o == null) {
       return null;
     }
     if (o instanceof List<?>) {
@@ -414,6 +419,10 @@ public class IOSCapabilities extends DesiredCapabilities {
 
   public boolean isAcceptAllCerts() {
     return getBooleanCapability(CapabilityType.ACCEPT_SSL_CERTS);
+  }
+
+  public boolean isSafari() {
+    return "com.apple.mobilesafari".equals(getBundleId()) || "Safari".equals(getBundleName());
   }
 
   private boolean getBooleanCapability(String key) {

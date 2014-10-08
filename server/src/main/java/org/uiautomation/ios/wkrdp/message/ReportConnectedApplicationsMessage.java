@@ -42,7 +42,8 @@ public class ReportConnectedApplicationsMessage extends BaseIOSWebKitMessage {
 
   @Override
   protected String toString(NSDictionary args) {
-    return apps.toString();
+    //return apps.toString();
+    return rawMessage;
   }
 }
  /*
