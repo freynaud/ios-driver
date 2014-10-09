@@ -18,21 +18,25 @@ import org.uiautomation.ios.utils.Command;
 
 import java.util.Arrays;
 
-/**
- * Created by freynaud on 19/09/2014.
- */
+
 public class Xcode601 implements Xcode {
 
 
   @Override
   public void openURL(String uuid,String url) {
-    String[] args = new String[]{"xcrun", "simctl", "openurl", "51CB648A-25C7-4E16-AAB5-0FDBEBF4E700", url};
+    String[] args = new String[]{"xcrun", "simctl", "openurl", uuid, url};
     Command c = new Command(Arrays.asList(args), false);
-    c.executeAndWait(true,5000);
+    c.executeAndWait(false,5000);
   }
 
 
   public static void loadSimulatorInfo() {
 
+  }
+
+  public static void stop(String uuid) {
+    String[] args = new String[]{"xcrun", "simctl", "shutdown", uuid};
+    Command c = new Command(Arrays.asList(args), false);
+    c.executeAndWait(true,5000);
   }
 }

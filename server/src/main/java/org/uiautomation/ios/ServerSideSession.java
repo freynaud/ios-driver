@@ -256,8 +256,7 @@ public class ServerSideSession extends Session {
     if (capabilities.getDeviceVariation() == null) {
       // use a variation that matches the SDK, Regular wouldn't work for iOS 7
       String sdkVersion = capabilities.getSDKVersion();
-      capabilities.setDeviceVariation(DeviceVariation.getCompatibleVersion(
-          capabilities.getDevice(), sdkVersion));
+      capabilities.setDeviceVariation(DeviceVariation.iPhone5s);
     }
 
     DeviceMapping map = getIOSServerManager().getHostInfo().getDeviceUUIDMap();

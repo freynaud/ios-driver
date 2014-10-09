@@ -19,20 +19,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebDriverException;
+import org.uiautomation.ios.HostInfo;
 import org.uiautomation.ios.ServerSideSession;
+import org.uiautomation.ios.command.uiautomation.NewSessionNHandler;
 import org.uiautomation.ios.communication.device.DeviceType;
 import org.uiautomation.ios.communication.device.DeviceVariation;
-import org.uiautomation.ios.HostInfo;
-import org.uiautomation.ios.command.uiautomation.NewSessionNHandler;
 import org.uiautomation.ios.instruments.InstrumentsVersion;
 import org.uiautomation.ios.xcode.Xcode6Device;
+import org.uiautomation.ios.xcode.XcodeDeviceType;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SimulatorSettings {
@@ -52,17 +58,18 @@ public class SimulatorSettings {
   private final File globalPreferencePlist;
   private final HostInfo info;
   private final ServerSideSession session;
-  private String deviceName;
+  //private String deviceName;
 
   private InstrumentsVersion instrumentsVersion;
 
-  public SimulatorSettings(HostInfo info, String sdkVersion, boolean is64bit, ServerSideSession session) {
+  public SimulatorSettings(HostInfo info, String sdkVersion, boolean is64bit,
+                           ServerSideSession session) {
     this.exactSdkVersion = sdkVersion;
     this.is64bit = is64bit;
     this.info = info;
     this.contentAndSettingsFolder = getContentAndSettingsFolder();
     this.globalPreferencePlist = getGlobalPreferenceFile();
-    this.session =session;
+    this.session = session;
   }
 
   public void setLocationPreference(boolean authorized, String bundleId) {
@@ -140,22 +147,24 @@ public class SimulatorSettings {
    */
   public void setVariation(DeviceType device, DeviceVariation variation, String desiredSDKVersion)
       throws WebDriverException {
-    deviceName = AppleMagicString.getSimulateDeviceValue(device, variation, desiredSDKVersion, instrumentsVersion);
-    setDefaultSimulatorPreference("SimulateDevice", deviceName);
+    if (info.getDeviceUUIDMap() instanceof Xcode5DeviceMapping) {
+      XcodeDeviceType type = info.getDeviceUUIDMap().getDeviceType(variation);
+      setDefaultSimulatorPreference("SimulateDevice", type.getName());
 
-    String subfolder = getSDKSubfolder(desiredSDKVersion);
-    File sdk = new File(info.getXCodeInstall(), subfolder);
+      String subfolder = getSDKSubfolder(desiredSDKVersion);
+      File sdk = new File(info.getXCodeInstall(), subfolder);
 
-    if (!sdk.exists()) {
-      throw new WebDriverException(
-          "Cannot point simulator to requested sdk version " + sdk.getAbsolutePath());
+      if (!sdk.exists()) {
+        throw new WebDriverException(
+            "Cannot point simulator to requested sdk version " + sdk.getAbsolutePath());
+      }
+      setDefaultSimulatorPreference("currentSDKRoot", sdk.getAbsolutePath());
     }
-    setDefaultSimulatorPreference("currentSDKRoot", sdk.getAbsolutePath());
   }
 
   private String getSDKSubfolder(String desiredSDKVersion) {
     String suffix = desiredSDKVersion;
-    if("7.0.3".equals(desiredSDKVersion)){
+    if ("7.0.3".equals(desiredSDKVersion)) {
       suffix = "7.0";
     }
     return SDK_LOCATION + "iPhoneSimulator" + suffix + ".sdk";
@@ -205,7 +214,8 @@ public class SimulatorSettings {
       if (hasContentAndSettingsFolder()) {
         boolean ok = deleteRecursive(getContentAndSettingsFolder());
         if (!ok) {
-          System.err.println("cannot delete content and settings folder " + contentAndSettingsFolder);
+          System.err
+              .println("cannot delete content and settings folder " + contentAndSettingsFolder);
         }
       }
       boolean ok = contentAndSettingsFolder.mkdirs();
@@ -214,7 +224,7 @@ public class SimulatorSettings {
       }
     } else {
 
-      String uuid=((Xcode6Device)session.getDeviceTmp()).getUuid();
+      String uuid = ((Xcode6Device) session.getDeviceTmp()).getUuid();
       log.info("Reset content and settings");
       ClassicCommands.eraseSimByUUID(uuid);
 
@@ -271,7 +281,6 @@ public class SimulatorSettings {
   private boolean hasContentAndSettingsFolder() {
     return getContentAndSettingsFolder().exists();
   }
-
 
 
   private JSONObject loadGlobalPreferencesTemplate() throws JSONException, IOException {

@@ -233,13 +233,13 @@ public class NewSessionTest extends BaseIOSDriverTest {
   public Object[][] createData1() {
     return new Object[][]{
 
-        {DeviceType.iphone, DeviceVariation.iPhone, 320, 480},
-        {DeviceType.iphone, DeviceVariation.iPhoneRetina, 640, 960},
-        {DeviceType.iphone, DeviceVariation.iPhoneRetina_4inch, 640, 1136},
-        {DeviceType.iphone, DeviceVariation.iPhoneRetina_4inch_64bit, 640, 1136},
-        {DeviceType.ipad, DeviceVariation.iPad, 768, 1024},
+        {DeviceType.iphone, DeviceVariation.iPhone4, 320, 480},
+        {DeviceType.iphone, DeviceVariation.iPhone4s, 640, 960},
+        {DeviceType.iphone, DeviceVariation.iPhone5, 640, 1136},
+        {DeviceType.iphone, DeviceVariation.iPhone5s, 640, 1136},
+        {DeviceType.ipad, DeviceVariation.iPad2, 768, 1024},
         {DeviceType.ipad, DeviceVariation.iPadRetina, 1536, 2048},
-        {DeviceType.ipad, DeviceVariation.iPadRetina_64bit, 1536, 2048},
+        {DeviceType.ipad, DeviceVariation.iPadAir, 1536, 2048},
 
     };
   }
@@ -251,9 +251,10 @@ public class NewSessionTest extends BaseIOSDriverTest {
                                                          int expectedH) throws Exception {
 
     String sdk = ClassicCommands.getDefaultSDK();
-    if (!DeviceVariation.compatibleWithSDKVersion(device, variation, sdk)) {
-      return;
-    }
+    // TODO freynaud
+    //if (!DeviceVariation.compatibleWithSDKVersion(device, variation, sdk)) {
+    //  return;
+    // }
     IOSCapabilities cap = new IOSCapabilities();
 
     cap.setCapability(DEVICE, device);

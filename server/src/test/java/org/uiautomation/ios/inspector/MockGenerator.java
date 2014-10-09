@@ -47,15 +47,15 @@ public class MockGenerator {
     server.start();
 
     DeviceVariation[] iphoneVariations = {
-        DeviceVariation.iPhone,
-        DeviceVariation.iPhoneRetina,
-        DeviceVariation.iPhoneRetina_4inch,
-        DeviceVariation.iPhoneRetina_4inch_64bit
+        DeviceVariation.iPhone4,
+        DeviceVariation.iPhone4s,
+        DeviceVariation.iPhone5,
+        DeviceVariation.iPhone5s
     };
     DeviceVariation[] ipadVariations = {
-        DeviceVariation.iPad,
+        DeviceVariation.iPad2,
         DeviceVariation.iPadRetina,
-        DeviceVariation.iPadRetina_64bit
+        DeviceVariation.iPadAir
     };
 
     generateAllVariations(DeviceType.iphone, iphoneVariations);

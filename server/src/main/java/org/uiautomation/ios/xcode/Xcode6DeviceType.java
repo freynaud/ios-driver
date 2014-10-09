@@ -28,6 +28,7 @@ public class Xcode6DeviceType implements XcodeDeviceType {
     return shortName;
   }
 
+  @Override
   public String getName() {
     return name;
   }

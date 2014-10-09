@@ -16,4 +16,5 @@ package org.uiautomation.ios.xcode;
 
 public interface XcodeDeviceType {
 
+  String getName();
 }

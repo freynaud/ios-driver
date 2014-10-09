@@ -36,14 +36,14 @@ public class MockedCache implements Cache {
 
   public MockedCache() throws Exception {
     for (Orientation o : Orientation.values()) {
-      addModel(DeviceType.iphone, DeviceVariation.iPhone, o);
-      addModel(DeviceType.iphone, DeviceVariation.iPhoneRetina, o);
-      addModel(DeviceType.iphone, DeviceVariation.iPhoneRetina_4inch, o);
-      addModel(DeviceType.iphone, DeviceVariation.iPhoneRetina_4inch_64bit, o);
+      addModel(DeviceType.iphone, DeviceVariation.iPhone4, o);
+      addModel(DeviceType.iphone, DeviceVariation.iPhone4s, o);
+      addModel(DeviceType.iphone, DeviceVariation.iPhone5, o);
+      addModel(DeviceType.iphone, DeviceVariation.iPhone5s, o);
 
-      addModel(DeviceType.ipad, DeviceVariation.iPad, o);
+      addModel(DeviceType.ipad, DeviceVariation.iPad2, o);
       addModel(DeviceType.ipad, DeviceVariation.iPadRetina, o);
-      addModel(DeviceType.ipad, DeviceVariation.iPadRetina_64bit, o);
+      addModel(DeviceType.ipad, DeviceVariation.iPadAir, o);
     }
   }
 

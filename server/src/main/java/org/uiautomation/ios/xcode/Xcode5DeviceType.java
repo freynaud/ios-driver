@@ -50,6 +50,7 @@ public class Xcode5DeviceType implements XcodeDeviceType {
     }
   }
 
+  @Override
   public String getName() {
     return key;
   }

@@ -32,6 +32,7 @@ import org.uiautomation.ios.setup.IOSSafariSimulatorManager;
 import org.uiautomation.ios.utils.IOSVersion;
 import org.uiautomation.ios.wkrdp.WebKitRemoteDebugProtocolFactory;
 import org.uiautomation.ios.wkrdp.internal.WebKitRemoteDebugProtocol;
+import org.uiautomation.ios.xcode.Xcode6Device;
 import org.uiautomation.ios.xcode.XcodeFactory;
 
 import java.net.URL;
@@ -154,7 +155,8 @@ public class IOSDualDriver {
   private void forceWebViewToReloadManually(int retry) {
 
     if (1 == 1) {
-      XcodeFactory.create().openURL(session.getDeviceTmp().getInstrumentsWDevice(), "http://about:blank");
+      String uuid = ((Xcode6Device)session.getDeviceTmp()).getUuid();
+      XcodeFactory.create().openURL(uuid, "http://localhost:4444/wd/hub/status");
       log.info("got current url");
       try {
         String url = getRemoteWebDriver().getCurrentUrl();

@@ -108,6 +108,15 @@ public class XcrunListParsingTest {
     Assert.assertEquals(d.getInstrumentsWDevice(), "iPhone 6 Plus (8.0 Simulator)");
   }
 
+  @Test
+  public void getDevice3() {
+    Xcode6Runtime rt8 = parser.getRuntime("8.0");
+    Xcode6DeviceType type = (Xcode6DeviceType) parser.getDeviceType(DeviceVariation.iPadRetina);
+    Xcode6Device d = (Xcode6Device) parser.getDevice(rt8, type);
+    Assert.assertEquals(d.getUuid(), "C4805133-84D7-4283-88A2-4329D8728BBB");
+    Assert.assertEquals(d.getInstrumentsWDevice(), "iPad Retina (8.0 Simulator)");
+  }
+
   private String deviceoutput = "Known Devices:\n"
                                 + "freynaud-mbp [023290A0-07D8-5FF7-9E74-E266D9FFE4B0]\n"
                                 + "Resizable iPad (8.0 Simulator) [6F5DA88B-A160-41AD-83A1-862C0CBCDFF2]\n"

@@ -34,11 +34,14 @@ public final class NewSessionNHandler extends BaseNativeCommandHandler {
   private static final Logger log = Logger.getLogger(NewSessionNHandler.class.getName());
   private long TIMEOUT_SEC;
   private static final long MAX_RETRIES = 3;
+  private final long deadline;
 
 
   public NewSessionNHandler(IOSServerManager driver, WebDriverLikeRequest request) {
     super(driver, request);
     TIMEOUT_SEC = driver.getIOSServerConfiguration().getNewSessionTimeoutSec();
+    deadline = System.currentTimeMillis() + (TIMEOUT_SEC*1000)*(MAX_RETRIES);
+    log.info("timeout for new session: "+((TIMEOUT_SEC*1000)*(MAX_RETRIES)));
   }
 
   @Override

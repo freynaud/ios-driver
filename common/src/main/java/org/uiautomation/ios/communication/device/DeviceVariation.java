@@ -18,23 +18,6 @@ import org.openqa.selenium.WebDriverException;
 import org.uiautomation.ios.utils.IOSVersion;
 
 public enum DeviceVariation {
-  // Legacy names, preserved because they are client-visible as capability names.
-  Regular,  // iPhone or iPad.
-  Retina35, // iPhone retina 3.5".
-  Retina4,  // iPhone retina 4".
-  Retina,   // iPad retina.
-  iPad25,   // iPad Mini.
-
-  // Normalized names. The naming scheme is accretive; as new devices are introduced, the corresponding names encode
-  // relevant distinguishing characteristics relative to the existing set of devices at the time of release.
-  iPhone,
-  iPhoneRetina,
-  iPhoneRetina_4inch,
-  iPhoneRetina_4inch_64bit,
-
-  iPad,
-  iPadRetina,
-  iPadRetina_64bit,
 
 
   // ios8 format
@@ -42,168 +25,17 @@ public enum DeviceVariation {
   ResizableiPhone,
 
   iPad2,
+  iPadRetina,
   iPadAir,
 
   iPhone4,
   iPhone4s,
   iPhone5,
   iPhone5s,
-  iPhone6Plus, iPhone6;
+  iPhone6Plus,
+  iPhone6;
 
-  public static DeviceVariation normalize(DeviceType deviceType, DeviceVariation deviceVariation,
-    int instrumentsMajorVersion) {
-      if (instrumentsMajorVersion >= 6) {
-        switch (deviceVariation) {
-          case iPhone:
-          case iPhoneRetina:
-            return iPhone4s;
-          case iPhoneRetina_4inch:
-            return iPhone5;
-          case iPhoneRetina_4inch_64bit:
-            return iPhone5s;
-          case iPad:
-            return iPad2;
-          case iPadRetina:
-            return iPadRetina;
-          case iPadRetina_64bit:
-            return iPadAir;
-        }
-      }
-      switch (deviceVariation) {
-        case Regular:
-          switch (deviceType) {
-            case iphone:
-              return iPhone;
-            case ipad:
-              return iPad;
-          }
-        case Retina35:
-          return iPhoneRetina;
-        case Retina4:
-          return iPhoneRetina_4inch;
-        case Retina:
-          return iPadRetina;
-        case iPad25:
-          return iPad;
-        default:
-          return deviceVariation;
-      }
-    }
 
-  public static boolean compatibleWithSDKVersion(DeviceType device, DeviceVariation deviceVariation,
-                                                 String sdkVersion) {
-    deviceVariation = DeviceVariation.normalize(device, deviceVariation,0);
-    boolean isSdk7OrNewer = (new IOSVersion(sdkVersion)).isGreaterOrEqualTo("7.0");
-    switch (device) {
-      case iphone:
-        switch (deviceVariation) {
-          case iPhone:
-            return !isSdk7OrNewer;
-          case iPhoneRetina_4inch_64bit:
-            return isSdk7OrNewer;
-        }
-        break;
-      case ipad:
-        switch (deviceVariation) {
-          case iPadRetina_64bit:
-            return isSdk7OrNewer;
-        }
-        break;
-    }
-    return true;
-  }
-  
-  public static DeviceVariation getCompatibleVersion(DeviceType device, String sdkVersion) {
-      boolean isSdk7OrNewer = (new IOSVersion(sdkVersion)).isGreaterOrEqualTo("7.0");
-      switch (device) {
-        case iphone:
-          return isSdk7OrNewer? iPhone5s : Regular;
-        case ipad:
-          return isSdk7OrNewer? iPad2 : Regular;
-      }
-      return Regular;
-  }
-
-  public static String deviceString(DeviceType deviceType, DeviceVariation deviceVariation,int instrumentsMajorVersion) {
-    String result;
-    boolean mismatch;
-
-    switch (normalize(deviceType, deviceVariation,instrumentsMajorVersion)) {
-      case iPhone:
-        result = "iPhone";
-        mismatch = (deviceType != DeviceType.iphone);
-        break;
-      case iPhoneRetina:
-        result = "iPhone Retina (3.5-inch)";
-        mismatch = (deviceType != DeviceType.iphone);
-        break;
-      case iPhoneRetina_4inch:
-        result = "iPhone Retina (4-inch)";
-        mismatch = (deviceType != DeviceType.iphone);
-        break;
-      case iPhoneRetina_4inch_64bit:
-        result = "iPhone Retina (4-inch 64-bit)";
-        mismatch = (deviceType != DeviceType.iphone);
-        break;
-      case iPhone4s:
-        result = "iPhone 4s";
-        mismatch = (deviceType != DeviceType.iphone);
-        break;
-      case iPhone5:
-        result = "iPhone 5";
-        mismatch = (deviceType != DeviceType.iphone);
-        break;
-      case iPhone5s:
-        result = "iPhone 5s";
-        mismatch = (deviceType != DeviceType.iphone);
-        break;
-      case iPhone6:
-        result = "iPhone 6";
-        mismatch = (deviceType != DeviceType.iphone);
-        break;
-      case iPhone6Plus:
-        result = "iPhone 6 Plus";
-        mismatch = (deviceType != DeviceType.iphone);
-        break;
-      case iPad:
-        result = "iPad";
-        mismatch = (deviceType != DeviceType.ipad);
-        break;
-      case iPadRetina:
-        result = "iPad Retina";
-        mismatch = (deviceType != DeviceType.ipad);
-        break;
-      case iPadRetina_64bit:
-        result = "iPad Retina (64-bit)";
-        mismatch = (deviceType != DeviceType.ipad);
-        break;
-      case iPad2:
-        result = "iPad 2";
-        mismatch = (deviceType != DeviceType.ipad);
-        break;
-      case iPadAir:
-        result = "iPad Air";
-        mismatch = (deviceType != DeviceType.ipad);
-        break;
-      case ResizableiPad:
-        result = "Resizable iPad";
-        mismatch = (deviceType != DeviceType.ipad);
-        break;
-      case ResizableiPhone:
-        result = "Resizable iPhone";
-        mismatch = (deviceType != DeviceType.iphone);
-        break;
-      default:
-        result = "";
-        mismatch = true;
-    }
-
-    if (mismatch) {
-      throw new WebDriverException(String.format("Unsupported device type/variation %s/%s",
-          deviceType.name(), deviceVariation.name()));
-    }
-    return result;
-  }
   
   public static boolean is64bit(DeviceVariation variation) {
     if (variation == null)

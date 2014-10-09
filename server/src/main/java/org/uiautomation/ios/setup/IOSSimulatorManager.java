@@ -14,15 +14,16 @@
 package org.uiautomation.ios.setup;
 
 import org.openqa.selenium.WebDriverException;
-import org.uiautomation.ios.IOSCapabilities;
-import org.uiautomation.ios.communication.device.DeviceType;
-import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.HostInfo;
+import org.uiautomation.ios.IOSCapabilities;
 import org.uiautomation.ios.ServerSideSession;
 import org.uiautomation.ios.application.IOSRunningApplication;
+import org.uiautomation.ios.communication.device.DeviceType;
+import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.utils.ClassicCommands;
 import org.uiautomation.ios.utils.IOSVersion;
 import org.uiautomation.ios.utils.SimulatorSettings;
+import org.uiautomation.ios.utils.Xcode5DeviceMapping;
 
 import java.io.File;
 import java.util.List;
@@ -63,7 +64,7 @@ public class IOSSimulatorManager implements IOSDeviceManager {
 
     xcodeInstall = ClassicCommands.getXCodeInstall();
     boolean is64bit = DeviceVariation.is64bit(caps.getDeviceVariation());
-    simulatorSettings = new SimulatorSettings(info, desiredSDKVersion, is64bit,session);
+    simulatorSettings = new SimulatorSettings(info, desiredSDKVersion, is64bit, session);
     bundleId = caps.getBundleId();
   }
 
@@ -81,7 +82,7 @@ public class IOSSimulatorManager implements IOSDeviceManager {
     boolean putDefaultFirst = instrumentsIs50OrHigher;
 
     simulatorSettings.setInstrumentsVersion(info.getInstrumentsVersion());
-    //simulatorSettings.setVariation(deviceType, variation, desiredSDKVersion);
+    simulatorSettings.setVariation(deviceType, variation, desiredSDKVersion);
     simulatorSettings.setInstrumentsVersion(info.getInstrumentsVersion());
     simulatorSettings.setSimulatorScale(caps.getSimulatorScale());
 
@@ -100,7 +101,9 @@ public class IOSSimulatorManager implements IOSDeviceManager {
 
   @Override
   public void teardown() {
-    String simulatorName = info.getInstrumentsVersion().getMajor() < 6 ? SIMULATOR_PROCESS_NAME : "iOS Simulator";
+    String
+        simulatorName =
+        info.getInstrumentsVersion().getMajor() < 6 ? SIMULATOR_PROCESS_NAME : "iOS Simulator";
     ClassicCommands.killall(simulatorName);
   }
 
@@ -111,8 +114,6 @@ public class IOSSimulatorManager implements IOSDeviceManager {
     }
     return sdk;
   }
-
-
 
 
 }

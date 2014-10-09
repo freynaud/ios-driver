@@ -28,10 +28,10 @@ import org.uiautomation.ios.command.UIAScriptResponse;
 import org.uiautomation.ios.command.uiautomation.StopInstrumentsRunLoop;
 import org.uiautomation.ios.instruments.commandExecutor.CURLIAutomationCommandExecutor;
 import org.uiautomation.ios.instruments.commandExecutor.UIAutomationCommandExecutor;
-import org.uiautomation.ios.utils.AppleMagicString;
 import org.uiautomation.ios.utils.ClassicCommands;
 import org.uiautomation.ios.utils.Command;
 import org.uiautomation.ios.utils.CommandOutputListener;
+import org.uiautomation.ios.xcode.Xcode601;
 import org.uiautomation.ios.xcode.Xcode6Device;
 
 import java.io.File;
@@ -99,6 +99,8 @@ public class InstrumentsCommandLine implements Instruments {
     boolean success = false;
     try {
       log.info(instruments.toString());
+      String uuid = ((Xcode6Device)session.getDeviceTmp()).getUuid();
+      Xcode601.stop(uuid);
       instruments.start();
       // for the no delay instruments, the command launches a script that in turn launches instruments.
       // need to keep the pid of intruments itself to be able to kill it.
@@ -116,7 +118,6 @@ public class InstrumentsCommandLine implements Instruments {
       } else {
         log.warning("instruments crashed. Waiting before retrying");
         try {
-          String uuid = ((Xcode6Device)session.getDeviceTmp()).getUuid();
           log.warning("trying to shutdown " + uuid);
           ClassicCommands.shutdownByUUid(uuid);
           log.info("Killing Sim");
@@ -198,11 +199,13 @@ public class InstrumentsCommandLine implements Instruments {
     } else if (application.isSimulator()) {
       args.add("-w");
       //args.add(session.getDevice6().getKey());
-      if (session.getDevice() instanceof SimulatorDevice.RunningSimulatorDevice){
-        SimulatorDevice.RunningSimulatorDevice rd = (SimulatorDevice.RunningSimulatorDevice)session.getDevice();
-      args.add(rd.getKey());
+      if (session.getDevice() instanceof SimulatorDevice.RunningSimulatorDevice) {
+        SimulatorDevice.RunningSimulatorDevice
+            rd =
+            (SimulatorDevice.RunningSimulatorDevice) session.getDevice();
+        args.add(rd.getKey());
 
-      }else{
+      } else {
         log.warning("not supported ?");
       }
     }
@@ -267,7 +270,8 @@ public class InstrumentsCommandLine implements Instruments {
     if (instruments != null) {
       instruments.registerListener(listener);
     } else {
-      log.warning("trying to register an output listener on instruments, but instruments is null, not created yet.");
+      log.warning(
+          "trying to register an output listener on instruments, but instruments is null, not created yet.");
     }
   }
 
