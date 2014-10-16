@@ -53,7 +53,8 @@ public final class NewSessionNHandler extends BaseNativeCommandHandler {
       IOSCapabilities cap = new IOSCapabilities(payload.getJSONObject("desiredCapabilities"));
 
       long timeOut = TIMEOUT_SEC;
-      for (int i = 0; i < MAX_RETRIES; i++) {
+      int i =0;
+      while (System.currentTimeMillis() < deadline){
         session = safeStart(timeOut, cap);
         timeOut = (i + 2) * TIMEOUT_SEC;
 

@@ -99,8 +99,10 @@ public class InstrumentsCommandLine implements Instruments {
     boolean success = false;
     try {
       log.info(instruments.toString());
-      String uuid = ((Xcode6Device)session.getDeviceTmp()).getUuid();
-      Xcode601.stop(uuid);
+      if (session.getDeviceTmp() instanceof Xcode6Device){
+      String uuid = ((Xcode6Device) session.getDeviceTmp()).getUuid();
+        Xcode601.stop(uuid);
+      }
       instruments.start();
       // for the no delay instruments, the command launches a script that in turn launches instruments.
       // need to keep the pid of intruments itself to be able to kill it.
@@ -116,7 +118,7 @@ public class InstrumentsCommandLine implements Instruments {
         }
         log.fine("registration request received" + session.getCachedCapabilityResponse());
       } else {
-        log.warning("instruments crashed. Waiting before retrying");
+        /*log.warning("instruments crashed. Waiting before retrying");
         try {
           log.warning("trying to shutdown " + uuid);
           ClassicCommands.shutdownByUUid(uuid);
@@ -126,7 +128,7 @@ public class InstrumentsCommandLine implements Instruments {
         } catch (Exception e) {
           log.warning("couldn't shutdown " + e.getMessage());
 
-        }
+        }*/
         throw new SessionNotInitializedException("instruments crashed right away.");
       }
 

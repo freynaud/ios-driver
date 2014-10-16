@@ -39,13 +39,17 @@ public class Xcode5DeviceMapping implements CommandOutputListener, DeviceMapping
 
   @Override
   public void init() {
-    List<String> listArgs = new ArrayList<>();
+    /*List<String> listArgs = new ArrayList<>();
     listArgs.add("instruments");
     listArgs.add("-s");
     listArgs.add("devices");
     Command listCommand = new Command(listArgs, false);
     listCommand.registerListener(this);
-    listCommand.executeAndWait(false, 5000);
+    listCommand.executeAndWait(false, 15000);*/
+    String[] pieces = out.split("\n");
+    for (String s : pieces){
+      stdout(s);
+    }
   }
 
   @Override
@@ -104,4 +108,22 @@ public class Xcode5DeviceMapping implements CommandOutputListener, DeviceMapping
   public void stderr(String log) {
 
   }
+
+
+
+  private final String out = "LM-ZRH-00981114 (com.apple.instruments.devices.local)\n"
+                             + "iPhone - Simulator - iOS 6.1\n"
+                             + "iPhone - Simulator - iOS 7.1\n"
+                             + "iPhone Retina (3.5-inch) - Simulator - iOS 6.1\n"
+                             + "iPhone Retina (3.5-inch) - Simulator - iOS 7.1\n"
+                             + "iPhone Retina (4-inch) - Simulator - iOS 6.1\n"
+                             + "iPhone Retina (4-inch) - Simulator - iOS 7.1\n"
+                             + "iPhone Retina (4-inch 64-bit) - Simulator - iOS 6.1\n"
+                             + "iPhone Retina (4-inch 64-bit) - Simulator - iOS 7.1\n"
+                             + "iPad - Simulator - iOS 6.1\n"
+                             + "iPad - Simulator - iOS 7.1\n"
+                             + "iPad Retina - Simulator - iOS 6.1\n"
+                             + "iPad Retina - Simulator - iOS 7.1\n"
+                             + "iPad Retina (64-bit) - Simulator - iOS 6.1\n"
+                             + "iPad Retina (64-bit) - Simulator - iOS 7.1\n";
 }
