@@ -99,8 +99,10 @@ public class InstrumentsCommandLine implements Instruments {
     boolean success = false;
     try {
       log.info(instruments.toString());
-      String uuid = ((Xcode6Device)session.getDeviceTmp()).getUuid();
-      Xcode601.stop(uuid);
+      if (session.getDeviceTmp() instanceof Xcode6Device) {
+        String uuid = ((Xcode6Device) session.getDeviceTmp()).getUuid();
+        Xcode601.stop(uuid);
+      }
       instruments.start();
       // for the no delay instruments, the command launches a script that in turn launches instruments.
       // need to keep the pid of intruments itself to be able to kill it.

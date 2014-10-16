@@ -271,7 +271,7 @@ public class ClassicCommands {
     simctlArgs.add(uuid);
     Command simctlCmd = new Command(simctlArgs, true);
     try {
-      simctlCmd.executeAndWait();
+      simctlCmd.executeAndWait(false,10000);
     } catch (Exception e) {
       log.warning(e.getMessage());
       log.warning("shuting down");
@@ -283,7 +283,7 @@ public class ClassicCommands {
       a.add("erase");
       a.add(uuid);
       Command c = new Command(a, true);
-      c.executeAndWait();
+      c.executeAndWait(false,10000);
     }
   }
 
@@ -294,7 +294,7 @@ public class ClassicCommands {
     sh.add("shutdown");
     sh.add(uuid);
     Command shut = new Command(sh, true);
-    int ret = shut.executeAndWait();
+    int ret = shut.executeAndWait(false,10000);
     if (ret != 0) {
       log.warning("couldn't shutdown " + uuid);
     }

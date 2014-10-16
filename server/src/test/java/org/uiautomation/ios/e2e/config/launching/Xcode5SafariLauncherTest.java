@@ -17,6 +17,7 @@ package org.uiautomation.ios.e2e.config.launching;
 
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
+import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.utils.ClassicCommands;
 import org.uiautomation.ios.utils.IOSVersion;
 
@@ -40,10 +41,10 @@ public class Xcode5SafariLauncherTest extends SafariLauncherTest {
   public Object[][] sdkAndSafariVersion() {
     {
       Object[][] res = new Object[][]{
-          {"6.0", "8536.25"},
-          {"6.1", "8536.25"},
-          {"7.0.3", "9537.53"},
-          {"7.1", "9537.53"},
+//          {"6.0", "8536.25", DeviceVariation.iPhone5s},
+          {"6.1", "8536.25",DeviceVariation.iPhone5s},
+         // {"7.0.3", "9537.53",DeviceVariation.iPhone5s},
+//          {"7.1", "9537.53",DeviceVariation.iPhone5s},
       };
       return res;
     }

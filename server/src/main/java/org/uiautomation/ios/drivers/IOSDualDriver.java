@@ -154,7 +154,7 @@ public class IOSDualDriver {
    */
   private void forceWebViewToReloadManually(int retry) {
 
-    if (1 == 1) {
+    if (session.getDeviceTmp() instanceof Xcode6Device) {
       String uuid = ((Xcode6Device)session.getDeviceTmp()).getUuid();
       XcodeFactory.create().openURL(uuid, "http://localhost:4444/wd/hub/status");
       log.info("got current url");
