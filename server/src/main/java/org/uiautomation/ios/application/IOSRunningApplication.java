@@ -60,7 +60,7 @@ public class IOSRunningApplication {
   }
   
   public void setSafariBuiltinFavorites() {
-    underlyingApplication.setSafariBuiltinFavorites();
+    //underlyingApplication.setSafariBuiltinFavorites();
   }
 
   public AppleLanguage getCurrentLanguage() {

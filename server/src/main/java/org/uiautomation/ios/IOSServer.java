@@ -184,7 +184,7 @@ public class IOSServer {
     p(String.format("Using iOS version %s", hostSDK));
 
     for (String s : driver.getHostInfo().getInstalledSDKs()) {
-      APPIOSApplication safari = MobileSafariLocator.locateSafariInstall(s);
+      APPIOSApplication safari = MobileSafariLocator.locateSafariInstall(driver.getHostInfo().getXCodeVersion().toString(),s);
       driver.updateSafariMapping(safari.getBundleVersion(),s);
       driver.addSupportedApplication(safari);
     }

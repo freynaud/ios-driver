@@ -76,12 +76,8 @@ public abstract class SafariLauncherTest extends BaseIOSDriverTest {
     }
   }
 
-  private void listProcesses() {
-    System.out.println("Process: " + ClassicCommands.psgrep("sim"));
 
-  }
-
-  @Test(enabled = false, dataProvider = "sdkAndSafariVersion", timeOut = 20000, dependsOnMethods = "supportAllInstalledSDKsSafari")
+  @Test( dataProvider = "sdkAndSafariVersion", timeOut = 20000, dependsOnMethods = "supportAllInstalledSDKsSafari")
   public void safariGuessesVersionGivenASDKs(String sdk, String version, DeviceVariation variation) {
     try {
       IOSCapabilities cap = IOSCapabilities.iphone("Safari");
@@ -105,7 +101,7 @@ public abstract class SafariLauncherTest extends BaseIOSDriverTest {
   }
 
 
-  @Test(enabled = false, dataProvider = "versionToSDK", timeOut = 20000, dependsOnMethods = "supportAllInstalledSDKsSafari")
+  @Test( dataProvider = "versionToSDK", timeOut = 20000, dependsOnMethods = "supportAllInstalledSDKsSafari")
   public void safariTakesLatestGivenAVersion(String sdk, String version) {
     try {
       IOSCapabilities cap = IOSCapabilities.iphone("Safari", version);
@@ -128,7 +124,7 @@ public abstract class SafariLauncherTest extends BaseIOSDriverTest {
   }
 
 
-  @Test(enabled = false, dataProvider = "invalid", timeOut = 1000, expectedExceptions = WebDriverException.class)
+  @Test( dataProvider = "invalid", timeOut = 1000, expectedExceptions = WebDriverException.class)
   public void detectInvalidConfigs(String sdk, String version) {
     IOSCapabilities cap = IOSCapabilities.iphone("Safari", version);
     cap.setSDKVersion(sdk);

@@ -18,7 +18,7 @@ import org.uiautomation.ios.instruments.InstrumentsVersion;
 import org.uiautomation.ios.utils.ClassicCommands;
 import org.uiautomation.ios.utils.DeviceMapping;
 import org.uiautomation.ios.utils.DeviceMappingFactory;
-import org.uiautomation.ios.utils.XCode6DeviceMapping;
+import org.uiautomation.ios.utils.IOSVersion;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,6 +36,7 @@ public final class HostInfo {
   private final InstrumentsVersion instrumentsVersion;
   private final int port;
   private DeviceMapping deviceMapping;
+  private final IOSVersion XCodeVersion;
 
   public HostInfo(IOSServerConfiguration config) {
     this.port = config.getPort();
@@ -53,11 +54,13 @@ public final class HostInfo {
       instrumentsVersion = ClassicCommands.getInstrumentsVersion();
       deviceMapping = DeviceMappingFactory.create();
       deviceMapping.init();
+      XCodeVersion = ClassicCommands.getXCodeVersion();
     } else {
       simulatorVersion = "";
       installedSimulators = new ArrayList<String>();
       xCodeInstall = null;
       instrumentsVersion = null;
+      XCodeVersion = null;
     }
   }
 
@@ -69,7 +72,7 @@ public final class HostInfo {
     return xCodeInstall;
   }
 
-  public InstrumentsVersion getInstrumentsVersion(){
+  public InstrumentsVersion getInstrumentsVersion() {
     return instrumentsVersion;
   }
 
@@ -80,16 +83,20 @@ public final class HostInfo {
   public int getPort() {
     return port;
   }
-  
+
   public String getOSInfo() {
-      return osName + ' ' + osVersion + " (" + osArch + ')';
+    return osName + ' ' + osVersion + " (" + osArch + ')';
   }
-  
+
   public String getJavaVersion() {
-      return javaVersion;
+    return javaVersion;
   }
 
   public DeviceMapping getDeviceUUIDMap() {
     return deviceMapping;
+  }
+
+  public IOSVersion getXCodeVersion() {
+    return XCodeVersion;
   }
 }

@@ -27,7 +27,6 @@ import org.uiautomation.ios.application.NoSuchLocaleException;
 import org.uiautomation.ios.command.configuration.Configuration;
 import org.uiautomation.ios.command.configuration.DriverConfigurationStore;
 import org.uiautomation.ios.communication.WebDriverLikeCommand;
-import org.uiautomation.ios.communication.device.DeviceType;
 import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.drivers.IOSDualDriver;
 import org.uiautomation.ios.instruments.InstrumentsFailedToStartException;
@@ -38,10 +37,8 @@ import org.uiautomation.ios.session.monitor.ServerSideSessionMonitor;
 import org.uiautomation.ios.session.monitor.SessionTimeoutMonitor;
 import org.uiautomation.ios.utils.ClassicCommands;
 import org.uiautomation.ios.utils.DeviceMapping;
-import org.uiautomation.ios.utils.XCode6DeviceMapping;
+import org.uiautomation.ios.utils.IOSVersion;
 import org.uiautomation.ios.utils.ZipUtils;
-import org.uiautomation.ios.xcode.Xcode601;
-import org.uiautomation.ios.xcode.Xcode6Device;
 import org.uiautomation.ios.xcode.XcodeDevice;
 import org.uiautomation.ios.xcode.XcodeDeviceType;
 import org.uiautomation.ios.xcode.XcodeRuntime;
@@ -117,6 +114,8 @@ public class ServerSideSession extends Session {
       throw new SessionNotCreatedException("Cannot create logManager", ex);
     }
 
+    throwIfInvalidSettings();
+
     ensureLanguage();
     ensureLocale();
 
@@ -157,6 +156,21 @@ public class ServerSideSession extends Session {
     }
     setSessionState(SessionState.created);
 
+
+  }
+
+  private void throwIfInvalidSettings() {
+    String sdk = capabilities.getSDKVersion();
+    DeviceVariation variation = capabilities.getDeviceVariation();
+    if (sdk == null || variation == null) {
+      return;
+    }
+
+    IOSVersion v = new IOSVersion(sdk);
+    String major = v.getMajor();
+    if (!variation.canRunVersion(major)){
+      throw new SessionNotInitializedException("device  "+variation+" cannot run iOS"+major);
+    }
 
   }
 
@@ -256,14 +270,27 @@ public class ServerSideSession extends Session {
     if (capabilities.getDeviceVariation() == null) {
       // use a variation that matches the SDK, Regular wouldn't work for iOS 7
       String sdkVersion = capabilities.getSDKVersion();
-      capabilities.setDeviceVariation(DeviceVariation.iPhone5s);
+      IOSVersion v = new IOSVersion(sdkVersion);
+      switch (v.getMajor()) {
+        case "6":
+          capabilities.setDeviceVariation(DeviceVariation.iPhone4s);
+          break;
+        case "7":
+          capabilities.setDeviceVariation(DeviceVariation.iPhone5s);
+          break;
+        case "8":
+          capabilities.setDeviceVariation(DeviceVariation.iPhone6);
+          break;
+        default:
+          throw new SessionNotInitializedException("IOS version " + v + " not supported.");
+      }
     }
 
     DeviceMapping map = getIOSServerManager().getHostInfo().getDeviceUUIDMap();
 
     XcodeRuntime rt = map.getRuntime(capabilities.getSDKVersion());
     XcodeDeviceType type = map.getDeviceType(capabilities.getDeviceVariation());
-    this.deviceTmp = map.getDevice(rt,type);
+    this.deviceTmp = map.getDevice(rt, type);
 
   }
 
@@ -282,7 +309,9 @@ public class ServerSideSession extends Session {
     }
 
     if (version != null && !requiredVersion.equals(version)) {
-      throw new WebDriverException("Cannot launch safari " + version + " on SDK" + sdkVersion + ". Need version=" + requiredVersion);
+      throw new SessionNotInitializedException(
+          "Cannot launch safari " + version + " on SDK" + sdkVersion + ". Need version="
+          + requiredVersion);
     }
 
     if (version == null) {
@@ -359,20 +388,30 @@ public class ServerSideSession extends Session {
   }
 
   public synchronized void stop(StopCause cause) {
+    log.info("stopping session" + getSessionId());
     if (getSessionState() == SessionState.stopped) {
       return;
     }
+    log.info("stop cause " + cause);
     setStopCause(cause);
 
+    log.info("stopping monitors");
     for (ServerSideSessionMonitor monitor : monitors) {
       monitor.stopMonitoring();
     }
+    log.info("releasing device");
     if (device != null) {
       device.release();
+    } else {
+      log.info("device was null");
     }
 
+    log.info("releasing driver");
     if (driver != null) {
+      log.info("stopping driver");
       driver.stop();
+    } else {
+      log.info("driver was null");
     }
 
     if (getIOSServerManager() != null) {
@@ -418,7 +457,9 @@ public class ServerSideSession extends Session {
 
   public boolean hasTimedOutBetween2Commands() {
     if (getSessionState() == SessionState.running) {
-      long deadLine = getLastCommandTime() + (getOptions().getMaxIdleTimeBetween2CommandsInSeconds() * 1000);
+      long
+          deadLine =
+          getLastCommandTime() + (getOptions().getMaxIdleTimeBetween2CommandsInSeconds() * 1000);
       return System.currentTimeMillis() > deadLine;
     }
     return false;

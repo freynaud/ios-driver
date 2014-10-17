@@ -55,4 +55,10 @@ public class Xcode6NativeLauncherTest extends NativeLauncherTest {
     };
     return res;
   }
+
+  @DataProvider
+  @Override
+  public Object[][] wrongCombination() {
+    return new Object[0][0];
+  }
 }

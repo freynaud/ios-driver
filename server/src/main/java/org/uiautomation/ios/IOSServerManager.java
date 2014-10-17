@@ -200,8 +200,7 @@ public class IOSServerManager {
     return hostInfo.getPort();
   }
 
-  public ServerSideSession createSession(IOSCapabilities cap)
-      throws SessionNotInitializedException {
+  public ServerSideSession createSession(IOSCapabilities cap) throws SessionNotInitializedException {
 
     if (getState() != State.running) {
       return null;

@@ -330,7 +330,7 @@ public class APPIOSApplication {
     try {
       File plist = new File(app, "Info.plist");
 
-      PListFormat format = getFormat(plist);
+      PlistFileUtils.PListFormat format = PlistFileUtils.getFormat(plist);
       NSDictionary root = (NSDictionary) PropertyListParser.parse(new FileInputStream(plist));
 
       NSArray devices = (NSArray) root.objectForKey("UIDeviceFamily");
@@ -358,7 +358,7 @@ public class APPIOSApplication {
       rearrangedArray.setValue(putDefaultFirst ? 0 : index, defaultDevice);
       root.put("UIDeviceFamily", rearrangedArray);
 
-      write(plist, root, format);
+      PlistFileUtils.write(plist, root, format);
     } catch (Exception e) {
       throw new WebDriverException("Cannot change the default device for the app." + e.getMessage(), e);
     }
@@ -370,80 +370,17 @@ public class APPIOSApplication {
   /**
    * Modifies the BuiltinFavorites....plist in safariCopies/safari.app to contain only "about:blank"
    */
-  public void setSafariBuiltinFavorites() {
-    File[] files = app.listFiles(new FilenameFilter() {
-      @Override
-      public boolean accept(File dir, String name) {
-        return name.startsWith("BuiltinFavorites") && name.endsWith(".plist");
-      }
-    });
-    for (File plist : files) {
-      setSafariBuiltinFavories(plist);
-    }
-  }
 
-  private void setSafariBuiltinFavories(File builtinFavoritesPList) {
-    try {
-      PListFormat format = getFormat(builtinFavoritesPList);
-
-      NSArray root = new NSArray(1);
-      NSDictionary favorite = new NSDictionary();
-      favorite.put("Title", "about:blank");
-      favorite.put("URL", "about:blank");
-      root.setValue(0, favorite);
-
-      write(builtinFavoritesPList, root, format);
-    } catch (Exception e) {
-      throw new WebDriverException("Cannot set " + builtinFavoritesPList.getAbsolutePath()
-                                   + ": " + e.getMessage(), e);
-    }
-  }
 
   public boolean isSafari() {
     return "com.apple.mobilesafari".equals(getBundleId());
   }
 
-  enum PListFormat {
-    binary, text, xml
-  }
 
-  private void write(File dest, NSObject content, PListFormat format) throws IOException {
-    switch (format) {
-      case binary:
-        BinaryPropertyListWriter.write(dest, content);
-        break;
-      case xml:
-        PropertyListParser.saveAsXML(content, dest);
-        break;
-      case text:
-        if (content instanceof NSDictionary) {
-          PropertyListParser.saveAsASCII((NSDictionary) content, dest);
-        } else if (content instanceof NSArray) {
-          PropertyListParser.saveAsASCII((NSArray) content, dest);
-        } else {
-          throw new IllegalArgumentException("Invalid content type for ascii: " + content.getClass());
-        }
-        break;
-      default:
-        throw new IllegalArgumentException("Invalid plist output format: " + format);
-    }
-  }
 
-  private PListFormat getFormat(File f) throws IOException {
-    FileInputStream fis = new FileInputStream(f);
-    byte b[] = new byte[8];
-    fis.read(b, 0, 8);
-    String magicString = new String(b);
-    fis.close();
-    if (magicString.startsWith("bplist")) {
-      return PListFormat.binary;
-    } else if (magicString.trim().startsWith("(") || magicString.trim().startsWith("{")
-               || magicString.trim().startsWith("/")) {
-      return PListFormat.text;
-    } else {
-      return PListFormat.xml;
-    }
-  }
+
+
+
 
 
   public IOSCapabilities getCapabilities() {

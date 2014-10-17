@@ -58,14 +58,14 @@ public abstract class BaseIOSDriverTest {
 
   private void startServer() throws Exception {
     String[] args = {"-port", "4444", "-host", "localhost",
-                     //"-aut", SampleApps.getUICatalogFile(),
+                     "-aut", SampleApps.getUICatalogFile(),
                      //"-aut", SampleApps.getUICatalogIpad(),
                      //"-aut", SampleApps.getGeocoderFile(),
                      //"-aut", SampleApps.getIntlMountainsFile(),
                      //"-aut", SampleApps.gettestNoContentFile(),
                      //"-aut", SampleApps.getPPNQASampleApp(),
                      //"-aut","/Users/freynaud/eBay.app",
-                     "-aut","/Users/freynaud/UICatalog_8.app",
+//                     "-aut","/Users/freynaud/UICatalog.app",
                      /*"-beta",*/ "-folder", "applications",
                      "-sessionTimeout", "60",
     };

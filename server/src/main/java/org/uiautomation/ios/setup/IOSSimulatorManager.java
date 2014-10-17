@@ -63,7 +63,7 @@ public class IOSSimulatorManager implements IOSDeviceManager {
     this.desiredSDKVersion = validateSDK(caps.getSDKVersion());
 
     xcodeInstall = ClassicCommands.getXCodeInstall();
-    boolean is64bit = DeviceVariation.is64bit(caps.getDeviceVariation());
+    boolean is64bit = caps.getDeviceVariation().is64bit();
     simulatorSettings = new SimulatorSettings(info, desiredSDKVersion, is64bit, session);
     bundleId = caps.getBundleId();
   }
@@ -105,6 +105,7 @@ public class IOSSimulatorManager implements IOSDeviceManager {
         simulatorName =
         info.getInstrumentsVersion().getMajor() < 6 ? SIMULATOR_PROCESS_NAME : "iOS Simulator";
     ClassicCommands.killall(simulatorName);
+    log.info("Killing : "+simulatorName);
   }
 
 

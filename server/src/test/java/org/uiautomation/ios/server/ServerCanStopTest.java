@@ -194,7 +194,7 @@ public class ServerCanStopTest {
       IOSVersion version = new IOSVersion(s);
       if (version.isGreaterOrEqualTo("6.0")) {
         safari = true;
-        driver.addSupportedApplication(MobileSafariLocator.locateSafariInstall(s));
+        driver.addSupportedApplication(MobileSafariLocator.locateSafariInstall(driver.getHostInfo().getXCodeVersion().toString(),s));
       }
     }
     if (safari) {

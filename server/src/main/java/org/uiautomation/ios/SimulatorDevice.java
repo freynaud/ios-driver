@@ -20,6 +20,7 @@ import org.uiautomation.ios.communication.device.DeviceType;
 import org.uiautomation.ios.communication.device.DeviceVariation;
 import org.uiautomation.ios.instruments.InstrumentsVersion;
 import org.uiautomation.ios.utils.ClassicCommands;
+import org.uiautomation.ios.utils.IOSVersion;
 import org.uiautomation.ios.xcode.XcodeDeviceType;
 import org.uiautomation.ios.xcode.XcodeRuntime;
 

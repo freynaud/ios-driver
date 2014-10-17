@@ -19,6 +19,7 @@ import org.openqa.selenium.WebDriverException;
 import org.uiautomation.ios.ServerSideSession;
 import org.uiautomation.ios.application.APPIOSApplication;
 import org.uiautomation.ios.application.IOSRunningApplication;
+import org.uiautomation.ios.application.MobileSafariLocator;
 import org.uiautomation.ios.utils.ClassicCommands;
 import org.uiautomation.ios.utils.IOSVersion;
 
@@ -36,14 +37,16 @@ public class IOSSafariSimulatorManager extends IOSSimulatorManager {
    */
   private final String desiredSDKVersion;
   private final File safariFolder;
+  private final File safariBackup;
   private boolean howToMoveSafariBackMessageGiven;
 
   public IOSSafariSimulatorManager(ServerSideSession session) {
 
     super(session);
     this.desiredSDKVersion = session.getCapabilities().getSDKVersion();
-    safariFolder =
-        APPIOSApplication.findSafariLocation(ClassicCommands.getXCodeInstall(), desiredSDKVersion);
+    File install = session.getIOSServerManager().getHostInfo().getXCodeInstall();
+    safariFolder = APPIOSApplication.findSafariLocation(install, desiredSDKVersion);
+    safariBackup =new File(safariFolder.getAbsolutePath()+".backup");
   }
 
 
@@ -52,7 +55,7 @@ public class IOSSafariSimulatorManager extends IOSSimulatorManager {
     if (!new IOSVersion(desiredSDKVersion).isGreaterOrEqualTo("8.0")) {
       copySafariToAllowInstallByInstruments();
     }
-    setFavorite();
+    //setFavorite();
 
     super.setup();
     simulatorSettings.setMobileSafariOptions();
@@ -82,11 +85,13 @@ public class IOSSafariSimulatorManager extends IOSSimulatorManager {
 
   private void copySafariToAllowInstallByInstruments() {
     // make backup copy before deleting
-    File
-        copy =
-        new File(System.getProperty("user.home") + "/.ios-driver/safariCopies",
-                 "MobileSafari-" + desiredSDKVersion + ".app");
+    String xcodeVersion = session.getIOSServerManager().getHostInfo().getXCodeVersion().toString();
+    File copy = MobileSafariLocator.getSafariCopy(xcodeVersion,desiredSDKVersion);
+    /*    new File(System.getProperty("user.home") + "/.ios-driver/safariCopies",
+                 "MobileSafari-" + desiredSDKVersion + ".app");*/
     if (!copy.exists()) {
+    throw new WebDriverException("Safari copy doesn't exist.");
+    /*
       copy.mkdirs();
       try {
         FileUtils.copyDirectory(safariFolder, copy);
@@ -95,35 +100,30 @@ public class IOSSafariSimulatorManager extends IOSSimulatorManager {
         log.log(Level.SEVERE, "Cannot create backup copy of safari : " + e.getMessage(), e);
         throw new WebDriverException("Cannot create backup copy of safari : " + e.getMessage());
       }
-    }
+    */}
 
     // delete MobileSafari in install dir
-    try {
-      FileUtils.deleteDirectory(safariFolder);
+
+      boolean renamed = safariFolder.renameTo(safariBackup);
+      if (!renamed){
+        log.severe("----------------------------------------------------------------------------");
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n---------> R E A D   T H I S:\ncouldn't delete MobileSafari app install dir: ");
+        sb.append("\nmake sure ios-driver has read/write permissions to that folder by executing those 2 commands:");
+        sb.append("\n\t$ sudo chmod a+rw " + safariFolder.getParentFile().getAbsolutePath());
+        sb.append("\n\t$ sudo chmod -R a+rw " + safariFolder.getAbsolutePath());
+        String em = sb.toString();
+        log.severe("----------------------------------------------------------------------------");
+        throw new WebDriverException(em);
+      }
       if (!howToMoveSafariBackMessageGiven) {
         howToMoveSafariBackMessageGiven = true;
         String to = safariFolder.getAbsolutePath();
         log.info(
             "temporarily moving MobileSafari out of the install directory, if you need to restore it yourself use:\n$ cp -rf "
-            + copy + ' ' + to);
+            + copy + " " + to);
       }
-    } catch (IOException e) {
-      log.log(Level.SEVERE,
-              "----------------------------------------------------------------------------");
-      StringBuilder sb = new StringBuilder();
-      sb.append(
-          "\n---------> R E A D   T H I S:\ncouldn't delete MobileSafari app install dir: " + e
-              .getMessage());
-      sb.append(
-          "\nmake sure ios-driver has read/write permissions to that folder by executing those 2 commands:");
-      sb.append("\n\t$ sudo chmod a+rw " + safariFolder.getParentFile().getAbsolutePath());
-      sb.append("\n\t$ sudo chmod -R a+rw " + safariFolder.getAbsolutePath());
-      String em = sb.toString();
-      log.log(Level.SEVERE, em, e);
-      log.log(Level.SEVERE,
-              "----------------------------------------------------------------------------");
-      throw new WebDriverException(em);
-    }
+
   }
 
 
@@ -134,16 +134,9 @@ public class IOSSafariSimulatorManager extends IOSSimulatorManager {
       return;
     }
 
-    File
-        copy =
-        new File(System.getProperty("user.home") + "/.ios-driver/safariCopies",
-                 "MobileSafari-" + desiredSDKVersion + ".app");
-    safariFolder.mkdir();
-    try {
-      FileUtils.copyDirectory(copy, safariFolder);
-    } catch (IOException e) {
-      log.warning(
-          "cannot copy MobileSafari app back to: " + safariFolder.getAbsolutePath() + ": " + e);
+    boolean renamed = safariBackup.renameTo(safariFolder);
+    if (!renamed){
+      throw new WebDriverException("couldn't put safari back");
     }
   }
 }

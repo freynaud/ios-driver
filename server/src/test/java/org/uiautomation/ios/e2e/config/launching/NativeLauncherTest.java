@@ -15,6 +15,7 @@
 package org.uiautomation.ios.e2e.config.launching;
 
 
+import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -42,6 +43,10 @@ public abstract class NativeLauncherTest extends BaseIOSDriverTest {
   public abstract Object[][] sdk();
 
 
+  @DataProvider
+  public abstract Object[][] wrongCombination();
+
+
   @Test(dataProvider = "sdk")
   public void supportAllInstalledSDKs(String sdk, DeviceVariation variation) {
     try {
@@ -54,13 +59,21 @@ public abstract class NativeLauncherTest extends BaseIOSDriverTest {
       Assert.assertEquals(actual.getSDKVersion(), sdk);
       Assert.assertEquals(actual.getBundleVersion(), version);
 
-
     } finally {
       if (driver != null) {
         driver.quit();
         driver = null;
       }
     }
+  }
+
+
+  @Test(dataProvider = "wrongCombination",expectedExceptions = WebDriverException.class)
+  public void throwsOnInvalidSDKDeviceCombination(String sdk,DeviceVariation variation){
+    IOSCapabilities cap = IOSCapabilities.iphone("UICatalog");
+    cap.setSDKVersion(sdk);
+    cap.setDeviceVariation(variation);
+    driver = new RemoteIOSDriver(getRemoteURL(), cap);
   }
 
 

@@ -20,7 +20,6 @@ import org.uiautomation.ios.Device;
 import org.uiautomation.ios.IOSCapabilities;
 import org.uiautomation.ios.RealDevice;
 import org.uiautomation.ios.ServerSideSession;
-import org.uiautomation.ios.SessionNotInitializedException;
 import org.uiautomation.ios.SimulatorDevice;
 import org.uiautomation.ios.application.IOSRunningApplication;
 import org.uiautomation.ios.command.UIAScriptRequest;
@@ -99,8 +98,8 @@ public class InstrumentsCommandLine implements Instruments {
     boolean success = false;
     try {
       log.info(instruments.toString());
-      if (session.getDeviceTmp() instanceof Xcode6Device){
-      String uuid = ((Xcode6Device) session.getDeviceTmp()).getUuid();
+      if (session.getDeviceTmp() instanceof Xcode6Device) {
+        String uuid = ((Xcode6Device) session.getDeviceTmp()).getUuid();
         Xcode601.stop(uuid);
       }
       instruments.start();
@@ -129,7 +128,7 @@ public class InstrumentsCommandLine implements Instruments {
           log.warning("couldn't shutdown " + e.getMessage());
 
         }*/
-        throw new SessionNotInitializedException("instruments crashed right away.");
+        throw new InstrumentsFailedToStartException("instruments crashed right away.");
       }
 
       if (!success) {

@@ -101,11 +101,11 @@ public final class NewSessionNHandler extends BaseNativeCommandHandler {
       return session;
     } catch (SessionNotInitializedException e) {
       log.info("The server cannot run " + cap + " at the moment." + e.getMessage());
-
-      //throw new SessionNotCreatedException("The server cannot run " + cap + " at the moment." + e.getMessage());
       if (session != null) {
         session.stop();
       }
+
+      throw e;
     } catch (InstrumentsFailedToStartException e) {
       log.warning("Instruments failed to start in the allocated time ( " + timeOut + "sec):" + e
           .getMessage());

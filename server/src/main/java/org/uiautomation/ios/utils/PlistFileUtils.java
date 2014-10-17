@@ -13,6 +13,9 @@
  */
 package org.uiautomation.ios.utils;
 
+import com.dd.plist.BinaryPropertyListWriter;
+import com.dd.plist.NSArray;
+import com.dd.plist.NSDictionary;
 import com.dd.plist.NSObject;
 import com.dd.plist.PropertyListParser;
 
@@ -21,6 +24,8 @@ import org.libimobiledevice.ios.driver.binding.model.ApplicationInfo;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Map;
 
 public class PlistFileUtils {
@@ -33,6 +38,10 @@ public class PlistFileUtils {
     this.plistContent = read(source);
   }
 
+  public enum PListFormat {
+    binary, text, xml
+  }
+
   private Map<String, Object> read(File plist) {
     try {
       NSObject object = PropertyListParser.parse(plist);
@@ -42,6 +51,43 @@ public class PlistFileUtils {
       throw new WebDriverException(
           String.format("In %s: Cannot parse %s: %s", source, plist.getAbsolutePath(), ex.getMessage()),
           ex);
+    }
+  }
+  public static void write(File dest, NSObject content, PlistFileUtils.PListFormat format) throws IOException {
+    switch (format) {
+      case binary:
+        BinaryPropertyListWriter.write(dest, content);
+        break;
+      case xml:
+        PropertyListParser.saveAsXML(content, dest);
+        break;
+      case text:
+        if (content instanceof NSDictionary) {
+          PropertyListParser.saveAsASCII((NSDictionary) content, dest);
+        } else if (content instanceof NSArray) {
+          PropertyListParser.saveAsASCII((NSArray) content, dest);
+        } else {
+          throw new IllegalArgumentException("Invalid content type for ascii: " + content.getClass());
+        }
+        break;
+      default:
+        throw new IllegalArgumentException("Invalid plist output format: " + format);
+    }
+  }
+
+  public static PListFormat getFormat(File f) throws IOException {
+    FileInputStream fis = new FileInputStream(f);
+    byte b[] = new byte[8];
+    fis.read(b, 0, 8);
+    String magicString = new String(b);
+    fis.close();
+    if (magicString.startsWith("bplist")) {
+      return PListFormat.binary;
+    } else if (magicString.trim().startsWith("(") || magicString.trim().startsWith("{")
+               || magicString.trim().startsWith("/")) {
+      return PListFormat.text;
+    } else {
+      return PListFormat.xml;
     }
   }
 

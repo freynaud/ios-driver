@@ -14,14 +14,19 @@
 
 package org.uiautomation.ios.application;
 
+import com.dd.plist.NSArray;
+import com.dd.plist.NSDictionary;
+
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriverException;
 import org.uiautomation.ios.IOSServer;
 import org.uiautomation.ios.utils.ClassicCommands;
 import org.uiautomation.ios.utils.IOSVersion;
+import org.uiautomation.ios.utils.PlistFileUtils;
 import org.uiautomation.ios.utils.SDKVersion;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,8 +39,8 @@ public class MobileSafariLocator {
   private static File xcode = ClassicCommands.getXCodeInstall();
   private static final Map<String, APPIOSApplication> safariCopies = new HashMap<>();
 
-  public static APPIOSApplication locateSafari(String sdkVersion) {
-    APPIOSApplication res = safariCopies.get(sdkVersion);
+  public static APPIOSApplication locateSafari(String xcodeVersion,String sdkVersion) {
+    APPIOSApplication res = safariCopies.get(xcodeVersion+sdkVersion);
     if (res !=null){
       return res;
     }
@@ -43,35 +48,69 @@ public class MobileSafariLocator {
   }
 
 
-  public static APPIOSApplication locateSafariInstall(String sdkVersion) {
+  public static APPIOSApplication locateSafariInstall(String xcodeVersion,String sdkVersion) {
     if (new IOSVersion(sdkVersion).isGreaterOrEqualTo("8.0")){
       File app = APPIOSApplication.findSafariLocation(xcode, sdkVersion);
       return new APPIOSApplication(app.getAbsolutePath());
     }else{
-      APPIOSApplication res = safariCopies.get(sdkVersion);
+      APPIOSApplication res = safariCopies.get(xcodeVersion+sdkVersion);
       if (res == null) {
-        res = copyOfSafari(xcode, sdkVersion);
-        safariCopies.put(sdkVersion, res);
+        res = copyOfSafari(xcode, xcodeVersion,sdkVersion);
+        safariCopies.put(xcodeVersion+sdkVersion, res);
       }
       return res;
     }
   }
 
-  // TODO freynaud - if xcode change, the safari copy should be wiped out.
-  private static APPIOSApplication copyOfSafari(File xcodeInstall, String sdk) {
-    File
-        copy =
-        new File(IOSServer.getTmpIOSFolder().getAbsolutePath(),
-                 "safariCopies/safari-" + sdk + ".app");
+  public static File getSafariCopy(String xcodeVersion,String sdk){
+    File parent = new File(IOSServer.getTmpIOSFolder().getAbsolutePath(), "safariCopies/"+xcodeVersion);
+    File copy = new File(parent,"safari-" + sdk + ".app");
+    return copy;
+  }
+  private static APPIOSApplication copyOfSafari(File xcodeInstall,String xcodeVersion, String sdk) {
+    File parent = new File(IOSServer.getTmpIOSFolder().getAbsolutePath(), "safariCopies/"+xcodeVersion);
+    parent.mkdirs();
+    File copy = new File(parent,"safari-" + sdk + ".app");
     if (!copy.exists()) {
       File safariFolder = APPIOSApplication.findSafariLocation(xcodeInstall, sdk);
       copy.mkdirs();
       try {
         FileUtils.copyDirectory(safariFolder, copy);
+        setSafariBuiltinFavorites(copy);
       } catch (IOException e) {
         log.warning("Cannot create the copy of safari : " + e.getMessage());
       }
     }
     return new APPIOSApplication(copy.getAbsolutePath());
+  }
+
+  public static void setSafariBuiltinFavorites(File safari) {
+    System.out.println("REMOVING SPLASH");
+    File[] files = safari.listFiles(new FilenameFilter() {
+      @Override
+      public boolean accept(File dir, String name) {
+        return name.startsWith("BuiltinFavorites") && name.endsWith(".plist");
+      }
+    });
+    for (File plist : files) {
+      setSafariBuiltinFavories(plist);
+    }
+  }
+
+  private static void setSafariBuiltinFavories(File builtinFavoritesPList) {
+    try {
+      PlistFileUtils.PListFormat format = PlistFileUtils.getFormat(builtinFavoritesPList);
+
+      NSArray root = new NSArray(1);
+      NSDictionary favorite = new NSDictionary();
+      favorite.put("Title", "about:blank");
+      favorite.put("URL", "about:blank");
+      root.setValue(0, favorite);
+
+      PlistFileUtils.write(builtinFavoritesPList, root, format);
+    } catch (Exception e) {
+      throw new WebDriverException("Cannot set " + builtinFavoritesPList.getAbsolutePath()
+                                   + ": " + e.getMessage(), e);
+    }
   }
 }

@@ -31,9 +31,9 @@ public class Xcode5NativeLauncherTest extends NativeLauncherTest {
     IOSVersion version = ClassicCommands.getXCodeVersion();
     Assert.assertTrue(version.equals("5.1.1"));
     List<String> sdks = ClassicCommands.getInstalledSDKs();
-    Assert.assertTrue(sdks.contains("6.0"));
+//    Assert.assertTrue(sdks.contains("6.0"));
     Assert.assertTrue(sdks.contains("6.1"));
-    Assert.assertTrue(sdks.contains("7.0.3"));
+//    Assert.assertTrue(sdks.contains("7.0.3"));
     Assert.assertTrue(sdks.contains("7.1"));
   }
 
@@ -41,10 +41,29 @@ public class Xcode5NativeLauncherTest extends NativeLauncherTest {
   @Override
   public Object[][] sdk() {
     Object[][] res = new Object[][]{
-        {"6.0", DeviceVariation.iPhone5},
-//        {"6.1", DeviceVariation.iPhone5},
-//        {"7.0.3", DeviceVariation.iPhone5},
-//        {"7.1", DeviceVariation.iPhone5},
+        {"6.1", DeviceVariation.iPhone4},
+        {"6.1", DeviceVariation.iPhone4s},
+        {"6.1", DeviceVariation.iPhone5},
+
+       // {"7.0.3", DeviceVariation.iPhone5},
+        {"7.1", DeviceVariation.iPhone5},
+        {"7.1", DeviceVariation.iPhone5s},
+    };
+    return res;
+  }
+
+  @DataProvider
+  @Override
+  public Object[][] wrongCombination(){
+    Object[][] res = new Object[][]{
+        {"6.1", DeviceVariation.iPhone5s},
+        {"6.1", DeviceVariation.iPhone6},
+        {"6.1", DeviceVariation.iPhone6Plus},
+        {"6.1", DeviceVariation.iPadAir},
+
+        {"7.1", DeviceVariation.iPhone4},
+        {"7.1", DeviceVariation.iPhone6},
+        {"7.1", DeviceVariation.iPhone6Plus},
     };
     return res;
   }

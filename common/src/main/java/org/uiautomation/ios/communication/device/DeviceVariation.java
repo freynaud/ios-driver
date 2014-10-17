@@ -15,14 +15,15 @@
 package org.uiautomation.ios.communication.device;
 
 import org.openqa.selenium.WebDriverException;
-import org.uiautomation.ios.utils.IOSVersion;
+
+import java.util.Arrays;
+import java.util.List;
 
 public enum DeviceVariation {
 
-
   // ios8 format
-  ResizableiPad,
-  ResizableiPhone,
+//  ResizableiPad,
+//  ResizableiPhone,
 
   iPad2,
   iPadRetina,
@@ -36,11 +37,25 @@ public enum DeviceVariation {
   iPhone6;
 
 
-  
-  public static boolean is64bit(DeviceVariation variation) {
-    if (variation == null)
-      return false;
-    return variation.toString().endsWith("_64bit");
+  public boolean is64bit() {
+
+    switch (this) {
+      case iPad2:
+      case iPadAir:
+        return false;
+      case iPadRetina:
+        return true;
+      case iPhone4:
+      case iPhone4s:
+      case iPhone5:
+        return false;
+      case iPhone5s:
+      case iPhone6Plus:
+      case iPhone6:
+        return true;
+      default:
+        throw new WebDriverException(this + " not implemented.");
+    }
   }
 
   public static DeviceVariation valueOf(Object o) {
@@ -54,7 +69,36 @@ public enum DeviceVariation {
       }
       throw new WebDriverException("not a valid DeviceVariation string: " + o);
     }
-    throw new WebDriverException("Cannot cast " + (o == null ? "null" : o.getClass()) + " to IOSDevice");
+    throw new WebDriverException(
+        "Cannot cast " + (o == null ? "null" : o.getClass()) + " to IOSDevice");
+  }
+
+
+  public boolean canRunVersion(String majorIOSVersion) {
+    return getSupportedIOSVersion().contains(majorIOSVersion);
+  }
+
+
+  private List<String> getSupportedIOSVersion() {
+    switch (this) {
+      case iPhone4:
+        return Arrays.asList(new String[]{"6"});
+      case iPhone4s:
+      case iPhone5:
+        return Arrays.asList(new String[]{"6", "7", "8"});
+      case iPhone5s:
+        return Arrays.asList(new String[]{"7", "8"});
+      case iPhone6:
+      case iPhone6Plus:
+        return Arrays.asList(new String[]{"8"});
+      case iPad2:
+      case iPadRetina:
+        return Arrays.asList(new String[]{"6", "7", "8"});
+      case iPadAir:
+        return Arrays.asList(new String[]{"7", "8"});
+      default:
+        throw new WebDriverException("Not implemented " + this);
+    }
   }
 }
 
