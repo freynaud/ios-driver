@@ -60,8 +60,8 @@ public class NewSessionTest extends BaseIOSDriverTest {
       sdk = ClassicCommands.getDefaultSDK();
     }
     IOSCapabilities actual = driver.getCapabilities();
-    Assert.assertEquals(actual.getBundleId(), "com.yourcompany.UICatalog");
-    Assert.assertEquals(actual.getBundleVersion(), "2.10");
+    Assert.assertEquals(actual.getBundleId(), "com.example.apple-samplecode.UICatalog");
+    Assert.assertEquals(actual.getBundleVersion(), "11.3");
     Assert.assertEquals(actual.getSDKVersion(), sdk);
   }
 
@@ -70,8 +70,8 @@ public class NewSessionTest extends BaseIOSDriverTest {
     driver = new RemoteIOSDriver(getRemoteURL(), SampleApps.uiCatalogCap());
 
     IOSCapabilities actual = driver.getCapabilities();
-    Assert.assertEquals(actual.getBundleId(), "com.yourcompany.UICatalog");
-    Assert.assertEquals(actual.getBundleVersion(), "2.10");
+    Assert.assertEquals(actual.getBundleId(), "com.example.apple-samplecode.UICatalog");
+    Assert.assertEquals(actual.getBundleVersion(), "11.3");
   }
 
   @Test
@@ -79,7 +79,8 @@ public class NewSessionTest extends BaseIOSDriverTest {
     driver = new RemoteIOSDriver(getRemoteURL(), SampleApps.noContentCap());
     IOSCapabilities actual = driver.getCapabilities();
     Assert.assertEquals(actual.getBundleId(), "freynaud.testNoContent");
-    Assert.assertEquals(actual.getBundleVersion(), "1.0");
+    Assert.assertEquals(actual.getVersion(), "1.0");
+    Assert.assertEquals(actual.getBundleVersion(), "1");
 
     try {
       driver.findElement(By.xpath("//*[@name=l10n('test')]"));
@@ -96,8 +97,8 @@ public class NewSessionTest extends BaseIOSDriverTest {
     driver = new RemoteIOSDriver(getRemoteURL(), capabilitiesNoLanguageNoLocale);
     IOSCapabilities actual = driver.getCapabilities();
 
-    Assert.assertEquals(actual.getBundleId(), "com.yourcompany.UICatalog");
-    Assert.assertEquals(actual.getBundleVersion(), "2.10");
+    Assert.assertEquals(actual.getBundleId(), "com.example.apple-samplecode.UICatalog");
+    Assert.assertEquals(actual.getBundleVersion(), "11.3");
     Assert.assertEquals(actual.getLanguage(), "en");
     Assert.assertEquals(actual.getLocale(), "en_GB");
   }
@@ -110,8 +111,8 @@ public class NewSessionTest extends BaseIOSDriverTest {
     driver = new RemoteIOSDriver(getRemoteURL(), cap);
 
     IOSCapabilities actual = driver.getCapabilities();
-    Assert.assertEquals(actual.getBundleId(), "com.yourcompany.InternationalMountains");
-    Assert.assertEquals(actual.getBundleVersion(), "1.1");
+    Assert.assertEquals(actual.getBundleId(), "com.example.apple-samplecode.InternationalMountains");
+    Assert.assertEquals(actual.getBundleVersion(), "1.3");
     // default to UK Assert.assertEquals(target.getLanguage(), "fr");
     Assert.assertEquals(actual.getLocale(), "es");
   }
@@ -192,7 +193,7 @@ public class NewSessionTest extends BaseIOSDriverTest {
     }
   }
 
-  @Test
+  @Test(enabled = false)
   public void correctDevice() {
     IOSCapabilities cap = IOSCapabilities.iphone("UICatalog");
     driver = new RemoteIOSDriver(getRemoteURL(), cap);
@@ -213,8 +214,8 @@ public class NewSessionTest extends BaseIOSDriverTest {
     cap.setCapability(IOSCapabilities.MAGIC_PREFIX + "CFBundleDevelopmentRegion", "en");
     driver = new RemoteIOSDriver(getRemoteURL(), cap);
     IOSCapabilities actual = driver.getCapabilities();
-    Assert.assertEquals(actual.getBundleId(), "com.yourcompany.UICatalog");
-    Assert.assertEquals(actual.getBundleVersion(), "2.10");
+    Assert.assertEquals(actual.getBundleId(), "com.example.apple-samplecode.UICatalog");
+    Assert.assertEquals(actual.getBundleVersion(), "11.3");
   }
 
 
@@ -240,7 +241,7 @@ public class NewSessionTest extends BaseIOSDriverTest {
     };
   }
 
-  @Test(dataProvider = "capabilities")
+  @Test(dataProvider = "capabilities",enabled = false)
   public void supportApplicationWithMultipleDeviceFamily(DeviceType device,
                                                          DeviceVariation variation,
                                                          int expectedW,

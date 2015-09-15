@@ -7,7 +7,7 @@ public class SampleConfig {
 
   private static final String SDK_VERSION_SYSTEM_PROPERTY = "SDK";
   private static final String UI_CATALOG_BUNDLE_NAME = "UICatalog";
-  private static final String BUNDLE_VERSION = "2.10";
+  private static final String BUNDLE_VERSION = "11.3";
 
   public static IOSCapabilities uiCatalogCapNoLangNoLocale() {
     IOSCapabilities capabilities = new IOSCapabilities();
