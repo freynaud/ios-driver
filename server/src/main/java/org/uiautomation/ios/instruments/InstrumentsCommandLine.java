@@ -191,8 +191,9 @@ public class InstrumentsCommandLine implements Instruments {
     } else if (application.isSimulator() && Double.parseDouble(version.getBuild()) >= 55044) {
       // newer instruments require to specify the simulator SDK and device type
       args.add("-w");
-      args.add(AppleMagicString.getDeviceSpecification(caps.getDevice(), caps.getDeviceVariation(),
-                                                       desiredSDKVersion, version));
+//      args.add(AppleMagicString.getDeviceSpecification(caps.getDevice(), caps.getDeviceVariation(),
+//                                                       desiredSDKVersion, version));
+      args.add("C2BBC97C-C74D-4296-934F-5E257C91F26E");
     }
     args.add("-t");
     args.add(template.getAbsolutePath());

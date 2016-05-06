@@ -73,7 +73,7 @@ public class TreeController implements IDECommandController {
     metadata.put("label", from.getString("label"));
     metadata.put("name", from.getString("name"));
     metadata.put("value", from.getString("value"));
-    if (from.has("l10n")) {
+    if (from.has("l10n") && !from.isNull("l10n")) {
       metadata.put("l10n", from.getJSONObject("l10n"));
     } else {
       metadata.put("l10n", new JSONObject().put("matches", 0));

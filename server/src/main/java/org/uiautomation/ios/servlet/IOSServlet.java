@@ -103,8 +103,10 @@ public class IOSServlet extends DriverBasedServlet {
         response.setHeader("location", url + "/session/" + session);
       }
 
+      log.warning("before convert : " + resp.getValue());
       BeanToJsonConverter converter = new BeanToJsonConverter();
       String s = converter.convert(resp);
+      log.warning("after convert : "+s);
 
       // status is also used for debugging, it's worth formatting it nice.
       if (req.getGenericCommand() == WebDriverLikeCommand.STATUS) {
@@ -155,7 +157,8 @@ public class IOSServlet extends DriverBasedServlet {
     try {
       wdlc = request.getGenericCommand();
       Handler h = CommandMapping.get(wdlc).createHandler(getDriver(), request);
-      return h.handleAndRunDecorators();
+      Response r =  h.handleAndRunDecorators();
+      return r;
     } catch (Exception we) {
       Response response = new Response();
 

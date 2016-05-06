@@ -53,9 +53,10 @@ public class StatusTest extends BaseIOSDriverTest {
     HttpHost h = new HttpHost(u.getHost(), u.getPort());
     HttpResponse response = client.execute(h, r);
 
-    JSONObject o = Helper.extractObject(response);
+    Map<String,?> o = Helper.extractObject(response);
 
-    JSONArray array = o.getJSONObject("value").getJSONArray("supportedApps");
+    // TODO freynaud gson
+    JSONArray array = null; //o.get("value").getJSONArray("supportedApps");
     Assert.assertTrue(array.length() > 3); // registered app + safari
 
     Map<String, JSONObject> apps = new HashMap<String, JSONObject>();

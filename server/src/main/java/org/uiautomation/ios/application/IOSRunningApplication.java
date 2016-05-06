@@ -22,7 +22,10 @@ import org.openqa.selenium.WebDriverException;
 import org.uiautomation.ios.IOSCapabilities;
 import org.uiautomation.ios.communication.device.DeviceType;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,8 +88,8 @@ public class IOSRunningApplication {
     }
   }
 
-  public JSONObject getTranslations(String name) throws JSONException {
-    JSONObject l10n = new JSONObject();
+  public Map<String,Object> getTranslations(String name) throws JSONException {
+    Map<String,Object> l10n = new HashMap<>();
     l10n.put("matches", 0);
     if (name != null && !name.isEmpty() && !"null".equals(name)) {
       try {
@@ -95,23 +98,23 @@ public class IOSRunningApplication {
         int size = results.size();
         if (size != 0) {
           l10n.put("matches", size);
-          JSONArray keys = new JSONArray();
+          List<String> keys = new ArrayList();
           for (ContentResult res : results) {
-            keys.put(res.getKey());
+            keys.add(res.getKey());
           }
           l10n.put("key", keys);
         }
 
-        JSONArray langs = new JSONArray();
+        List<Object> langs = new ArrayList<>();
         for (AppleLanguage language : underlyingApplication.getSupportedLanguages()) {
-          JSONArray possibleMatches = new JSONArray();
+          List<String> possibleMatches = new ArrayList();
 
           for (ContentResult res : results) {
-            possibleMatches.put(underlyingApplication.translate(res, language));
+            possibleMatches.add(underlyingApplication.translate(res, language));
           }
-          JSONObject match = new JSONObject();
+          Map<String,Object> match = new HashMap<>();
           match.put(language.toString(), possibleMatches);
-          langs.put(match);
+          langs.add(match);
 
         }
         l10n.put("langs", langs);

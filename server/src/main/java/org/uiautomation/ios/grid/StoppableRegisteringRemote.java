@@ -14,6 +14,7 @@ import org.openqa.selenium.remote.server.log.LoggingManager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.uiautomation.ios.communication.Helper.extractObject;
@@ -108,6 +109,7 @@ public class StoppableRegisteringRemote {
             new BasicHttpEntityEnclosingRequest("POST", registration.toExternalForm());
         String json = nodeConfig.toJSON();
         r.setEntity(new StringEntity(json, "UTF-8"));
+        System.out.println("registering : "+json);
 
         HttpHost host = new HttpHost(registration.getHost(), registration.getPort());
         HttpResponse response = client.execute(host, r);
@@ -143,7 +145,8 @@ public class StoppableRegisteringRemote {
       if (response.getStatusLine().getStatusCode() != 200) {
         throw new org.openqa.grid.common.exception.GridException("Hub is down or not responding.");
       }
-      JSONObject o = extractObject(response);
+      Map<String,?> o = extractObject(response);
+      System.out.printf("o"+o);
       return (Boolean) o.get("success");
     } catch (Exception e) {
       throw new org.openqa.grid.common.exception.GridException("Hub is down or not responding: " + e.getMessage());

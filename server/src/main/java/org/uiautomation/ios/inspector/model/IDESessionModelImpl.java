@@ -18,6 +18,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.SessionId;
@@ -73,6 +74,7 @@ public class IDESessionModelImpl implements IDESessionModel {
   public synchronized void refresh() {
     screenshot.delete();
     elementTree = driver.logElementTree(screenshot, true);
+    System.out.println("tree" + elementTree.toString());
   }
 
   /*
@@ -127,7 +129,8 @@ public class IDESessionModelImpl implements IDESessionModel {
       HttpHost h = new HttpHost(u.getHost(), u.getPort());
       HttpResponse response = client.execute(h, r);
 
-      return Helper.extractObject(response);
+
+      return new JSONObject(Helper.extractObject(response));
     } catch (Exception e) {
       throw new WebDriverException(e.getMessage(), e);
     }

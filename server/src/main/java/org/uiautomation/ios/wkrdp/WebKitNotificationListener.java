@@ -59,6 +59,7 @@ public class WebKitNotificationListener implements MessageListener {
 
   @Override
   public void onMessage(IOSMessage message) {
+    System.out.println("WK message : "+message);
     handleReportSetupMessage(message);
     handleReportConnectedApplicationsMessage(message);
     handleApplicationSentListingMessage(message);
@@ -189,7 +190,10 @@ public class WebKitNotificationListener implements MessageListener {
   private boolean isValidAppListingForProcessing(IOSMessage message) {
     if (!(message instanceof ApplicationSentListingMessage)) {
       return false;
-    }
+    }/*else {
+      return true;
+    }*/
+
     ApplicationSentListingMessage applicationSentListingMessage = ApplicationSentListingMessage.class.cast(message);
     String appIdentifier = applicationSentListingMessage.getApplicationIdentifier();
     WebkitApplication app = getApplicationForAppIdentifier(appIdentifier);

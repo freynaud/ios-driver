@@ -38,7 +38,7 @@ import java.util.Set;
 public class IOSServerConfiguration {
 
   public static final int SESSION_START_TIME_OUT_SEC = 20;
-  public static final int SESSION_TIME_OUT_SEC = 10 * 60;
+  public static final int SESSION_TIME_OUT_SEC = 100 * 60;
   public static final int MAX_IDLE_TIME_BTWEEN_COMMAND_SEC = 60;
   public static final int DEFAULT_PORT = 5555;
 

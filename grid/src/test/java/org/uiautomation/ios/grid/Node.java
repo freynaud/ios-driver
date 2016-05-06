@@ -14,10 +14,11 @@
 
 package org.uiautomation.ios.grid;
 
+
+import org.openqa.grid.common.JSONConfigurationUtils;
 import org.uiautomation.ios.IOSServer;
 
 public class Node {
-
 
   public static void main(String[] args) throws Exception {
     String[] a = new String[]{

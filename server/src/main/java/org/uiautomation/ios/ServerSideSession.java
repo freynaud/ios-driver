@@ -57,7 +57,7 @@ public class ServerSideSession extends Session {
   private static final Logger log = Logger.getLogger(ServerSideSession.class.getName());
   public final IOSServerManager server;
   private final IOSCapabilities capabilities;
-  private final IOSDualDriver driver;
+  private  IOSDualDriver driver;
   private final IOSServerConfiguration options;
   private final DriverConfiguration configuration;
   private IOSRunningApplication application;
@@ -110,19 +110,19 @@ public class ServerSideSession extends Session {
     ensureLocale();
 
     try {
-      device = server.findAndReserveMatchingDevice(desiredCapabilities);
+      //device = server.findAndReserveMatchingDevice(desiredCapabilities);
 
       // extract application from capabilities if necessary
       URL url = desiredCapabilities.getAppURL();
       if (url != null) {
         application = extractFromCapabilities();
       } else {
-        application = server.findAndCreateInstanceMatchingApplication(desiredCapabilities);
+        //application = server.findAndCreateInstanceMatchingApplication(desiredCapabilities);
       }
 
-      updateCapabilitiesWithSensibleDefaults();
+      //updateCapabilitiesWithSensibleDefaults();
 
-      driver = new IOSDualDriver(this);
+      //driver = new IOSDualDriver(this);
       configuration = new DriverConfigurationStore();
 
 
@@ -140,7 +140,7 @@ public class ServerSideSession extends Session {
     monitors.add(new ApplicationCrashMonitor(this));
 
     for (ServerSideSessionMonitor monitor : monitors) {
-      monitor.startMonitoring();
+//      monitor.startMonitoring();
     }
     setSessionState(SessionState.created);
 
@@ -274,7 +274,7 @@ public class ServerSideSession extends Session {
   }
 
   public String getTargetBundleId() {
-    if (isSafariRealDevice()) {
+    if (isSafariRealDevice() || true) {
       if (getVersionInt() >= 8) {
         // For versions iOS8+, both Safari and WebContent launch,
         // But the one that is connectable and contains tabs
@@ -289,7 +289,7 @@ public class ServerSideSession extends Session {
   }
 
   private int getVersionInt() {
-    String sdk = getDevice().getCapability().getSDKVersion();
+    String sdk = "9.2";//getDevice().getCapability().getSDKVersion();
     try {
       return Integer.valueOf(sdk.substring(0, sdk.indexOf(".")));
     } catch (IndexOutOfBoundsException | NumberFormatException e) {

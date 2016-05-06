@@ -52,10 +52,12 @@ public class DefaultMessageHandler implements MessageHandler {
 
   @Override
   public synchronized void handle(final String msg) {
+    System.out.println("MSG : "+msg);
     if (stopped) {
       throw new IllegalStateException("stopped");
     }
 
+    System.out.println("DefaultMessageHandler: GOT message "+msg);
     Thread t = new Thread("DefaultMessageHandler-" + ++threadCount) {
       @Override
       public void run() {
@@ -103,9 +105,9 @@ public class DefaultMessageHandler implements MessageHandler {
   @Override
   public void addListener(MessageListener listener) {
     listeners.add(listener);
-    log.log(Level.INFO,
+    /*.log(Level.INFO,
             "DefaultMessageHandler addListener type: " + listener.getClass().getName(),
-            new Exception("log the stack"));
+            new Exception("log the stack"));*/
     // Let all interested listeners know if this is a new WebInspector.
     if (listener instanceof WebInspector) {
       WebInspector inspector = (WebInspector) listener;

@@ -9,7 +9,7 @@ public class HubLauncher {
         "-port", "4444",
         "-host","localhost",
         "-role", "hub",
-        "-capabilityMatcher","org.uiautomation.ios.grid.IOSCapabilityMatcher,org.uiautomation.ios.grid.WebCapabilityMatcher"
+        "-capabilityMatcher","org.uiautomation.ios.grid.IOSCapabilityMatcher"
     };
     GridLauncher.main(a);
   }

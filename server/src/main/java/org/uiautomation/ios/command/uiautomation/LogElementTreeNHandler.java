@@ -61,6 +61,7 @@ public class LogElementTreeNHandler extends UIAScriptHandler {
     addDecorator(new GetHTMLForWebView(driver));
     try {
       if (request.getPayload().has("translation") && request.getPayload().getBoolean("translation")) {
+        System.out.println("Adding translation decorator.");
         addDecorator(new AddTranslationToLog(driver));
       }
     } catch (JSONException e) {
@@ -94,7 +95,9 @@ public class LogElementTreeNHandler extends UIAScriptHandler {
       Map<String, Object> value = (Map<String, Object>) response.getValue();
       try {
         Map<String, Object> rootNode = (Map<String, Object>) value.get("tree");
+        System.out.println("STARTING STRANSLATION");
         addTranslation(rootNode, getAUT());
+        System.out.println("translation :" + rootNode);
       } catch (Exception e) {
         log.log(Level.SEVERE,"decoration: translation error",e);
       }
@@ -104,6 +107,8 @@ public class LogElementTreeNHandler extends UIAScriptHandler {
     private void addTranslation(Map<String, Object> node, IOSRunningApplication aut)
         throws JSONException {
 
+      //System.out.println("adding translation to "+ (String) node.get("name"));
+      //System.out.printf("found " + aut.getTranslations((String) node.get("name")));
       node.put("l10n", aut.getTranslations((String) node.get("name")));
       List<Map<String, Object>> children = (List<Map<String, Object>>) node.get("children");
       if (children != null && children.size() != 0) {

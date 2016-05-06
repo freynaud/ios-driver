@@ -119,6 +119,7 @@ public final class NewSessionNHandler extends BaseNativeCommandHandler {
     } finally {
       if (session != null && session.getStopCause() != null) {
         log.warning("app has crashed at startup :" + session.getStopCause());
+        return session;
       }
     }
     return null;

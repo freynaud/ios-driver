@@ -17,6 +17,7 @@ package org.uiautomation.ios.e2e.config;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.OutputType;
@@ -37,7 +38,7 @@ import org.uiautomation.ios.utils.ClassicCommands;
 public class SmokeWebDriverTest extends BaseIOSDriverTest {
 
   @BeforeClass
-  public void startDriver() {
+  public void startDriver() throws JSONException, InterruptedException {
     driver = new RemoteIOSDriver(getRemoteURL(), SampleApps.uiCatalogCap());
   }
 

@@ -13,10 +13,13 @@
  */
 package org.uiautomation.ios.wkrdp.internal;
 
+import org.json.JSONException;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriverException;
 import org.uiautomation.ios.ServerSideSession;
 import org.uiautomation.ios.utils.PlistManager;
+import org.uiautomation.ios.wkrdp.command.DOM;
+import org.uiautomation.ios.wkrdp.command.Page;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -62,10 +65,14 @@ public class SimulatorProtocolImpl extends WebKitRemoteDebugProtocol {
   }
 
 
+
+
+
   /**
    * sends the message to the AUT.
    */
   protected void sendMessage(String xml) {
+    System.err.println("sending" +xml);
     byte[] bytes = null;
     try {
       bytes = xml.getBytes("UTF-8");
@@ -148,4 +155,20 @@ public class SimulatorProtocolImpl extends WebKitRemoteDebugProtocol {
     }
   }
 
+
+  public static void main(String[] args) throws InterruptedException, JSONException {
+
+    WebKitRemoteDebugProtocol impl = new SimulatorProtocolImpl(null);
+    impl.start();
+    impl.register();
+    Thread.sleep(1000);
+    impl.connect("com.apple.WebKit.WebContent");
+
+    impl.attachToPage(1);
+    System.out.println("--->"+impl.sendWebkitCommand(Page.enable(),1));
+    System.out.println("--->"+impl.sendWebkitCommand(Page.navigate("http://google.com"),1));
+    Thread.sleep(10000);
+    impl.stop();
+
+  }
 }

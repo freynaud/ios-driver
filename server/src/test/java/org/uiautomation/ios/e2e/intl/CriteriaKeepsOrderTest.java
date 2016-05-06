@@ -14,6 +14,7 @@
 
 package org.uiautomation.ios.e2e.intl;
 
+import org.json.JSONException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -33,7 +34,7 @@ public class CriteriaKeepsOrderTest extends BaseIOSDriverTest {
   }
 
   @Test
-  public void orCriteriaReturnsFirstMatch() {
+  public void orCriteriaReturnsFirstMatch() throws JSONException {
     Criteria mountain1 = new NameCriteria("Mountain 1");
     Criteria mountain2 = new NameCriteria("Mountain 2");
 
@@ -42,6 +43,7 @@ public class CriteriaKeepsOrderTest extends BaseIOSDriverTest {
 
     Assert.assertEquals(result1.getName(), "Mountain 1");
     Assert.assertEquals(result2.getName(), "Mountain 2");
+      System.out.println(driver.logElementTree(null, true).toString(2));
   }
 
   @Test

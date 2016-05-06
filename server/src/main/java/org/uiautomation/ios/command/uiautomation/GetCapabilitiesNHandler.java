@@ -35,7 +35,7 @@ public class GetCapabilitiesNHandler extends UIAScriptHandler {
 
   private static final JSTemplate template = new JSTemplate(
       "var json = UIAutomation.getCapabilities();" +
-      "UIAutomation.createJSONResponse('%:sessionId$s',0,json)",
+          "UIAutomation.createJSONResponse('%:sessionId$s',0,json)",
       "sessionId");
 
   public GetCapabilitiesNHandler(IOSServerManager driver, WebDriverLikeRequest request) {
@@ -52,7 +52,7 @@ public class GetCapabilitiesNHandler extends UIAScriptHandler {
       log.warning("Didn't know the capabilities. Should have known at registration.");
       throw new InstrumentsFailedToStartException(
           "The driver never recieved the capabilities or the "
-          + "device. Most likely instruments crashed.");
+              + "device. Most likely instruments crashed.");
     }
     return r;
   }
@@ -88,7 +88,8 @@ public class GetCapabilitiesNHandler extends UIAScriptHandler {
       o.put("browserName", session.getCapabilities().getBundleName());
       o.put("browserVersion", session.getApplication().getCapabilities().getBundleVersion());
 
-      o.put("platform", "IOS");
+      // TODO freynaud change selenium Platform to add IOS.
+      o.put("platform", "mac");
       o.put("platformName", "IOS");
       o.put("platformVersion", session.getCapabilities().getSDKVersion());
 

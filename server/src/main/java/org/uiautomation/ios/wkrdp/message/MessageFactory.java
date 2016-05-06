@@ -53,6 +53,9 @@ public class MessageFactory {
     "8.1", "8.1.1", "8.1.2", "8.1.3", 
     "8.2", "8.3", "8.4", "8.4.1");
 
+  private static final List<String> IOS9_TYPES = Arrays.asList(
+      "9.2");
+
   private final Map<List<String>, Map<String, Class<? extends BaseIOSWebKitMessage>>> iOSTypesMap;
 
   private String iOSVersion;
@@ -62,13 +65,14 @@ public class MessageFactory {
   private Condition determiningVersion;
 
   public MessageFactory(ServerSideSession session) {
-    iOSVersion = session.getDevice().getCapability().getSDKVersion();
+    iOSVersion = "9.2"; //session.getDevice().getCapability().getSDKVersion();
     iOSTypesMap = new HashMap<>();
     versionDeterminingLock = new ReentrantLock();
     determiningVersion = versionDeterminingLock.newCondition();
     populateDefaultTypes();
     populateIOS7Types();
     populateIOS8Types();
+    populateIOS9Types();
   }
 
   private void populateDefaultTypes() {
@@ -106,6 +110,21 @@ public class MessageFactory {
     types.put("_rpc_applicationUpdated:",
         org.uiautomation.ios.wkrdp.message.ios8.ApplicationUpdatedMessageImpl.class);
     iOSTypesMap.put(IOS8_TYPES, types);
+  }
+
+  private void populateIOS9Types() {
+    Map<String, Class<? extends BaseIOSWebKitMessage>> types = new HashMap<>();
+    types.put("_rpc_reportConnectedApplicationList:",
+        org.uiautomation.ios.wkrdp.message.ios9.ReportConnectedApplicationsMessageImpl.class);
+    types.put("_rpc_applicationSentListing:",
+        org.uiautomation.ios.wkrdp.message.ios9.ApplicationSentListingMessageImpl.class);
+    types.put("_rpc_applicationConnected:",
+        org.uiautomation.ios.wkrdp.message.ios9.ApplicationConnectedMessageImpl.class);
+    types.put("_rpc_applicationDisconnected:",
+        org.uiautomation.ios.wkrdp.message.ios9.ApplicationDisconnectedMessageImpl.class);
+    types.put("_rpc_applicationUpdated:",
+        org.uiautomation.ios.wkrdp.message.ios9.ApplicationUpdatedMessageImpl.class);
+    iOSTypesMap.put(IOS9_TYPES, types);
   }
 
   public IOSMessage create(String rawMessage) {
@@ -173,6 +192,9 @@ public class MessageFactory {
   }
 
   private List<String> getIOSTypeList() {
+    if (IOS9_TYPES.contains(iOSVersion)){
+      return IOS9_TYPES;
+    }
     if (IOS8_TYPES.contains(iOSVersion)) {
       return IOS8_TYPES;
     } else {

@@ -72,6 +72,12 @@ public class RemoteUIAAlert extends RemoteUIAElement implements UIAAlert, Alert 
   }
 
   @Override
+  public void setCredentials(Credentials credentials) {
+    // TODO freynaud
+    throw new RuntimeException("NI");
+  }
+
+  @Override
   public void authenticateUsing(Credentials credentials) {
     //To change body of implemented methods use File | Settings | File Templates.
   }

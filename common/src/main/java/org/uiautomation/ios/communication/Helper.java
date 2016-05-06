@@ -13,6 +13,7 @@
  */
 package org.uiautomation.ios.communication;
 
+import com.google.gson.JsonElement;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.json.JSONObject;
@@ -22,6 +23,7 @@ import org.openqa.selenium.remote.Response;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.Map;
 
 public class Helper {
 
@@ -31,7 +33,7 @@ public class Helper {
     return msg == null ? "" : (e instanceof WebDriverException) ? msg.split("\n")[0] : msg;
   }
 
-  public static JSONObject extractObject(HttpResponse resp) {
+  public static Map<String,?> extractObject(HttpResponse resp) {
     String str = "";
     try {
       InputStream is = resp.getEntity().getContent();
@@ -39,7 +41,7 @@ public class Helper {
       IOUtils.copy(is, writer, "UTF-8");
 
       str = writer.toString();
-      return new JSONObject(str);
+      return new JsonToBeanConverter().convert(Map.class,str);
     } catch (Exception e) {
       throw new WebDriverException(str, e);
     }

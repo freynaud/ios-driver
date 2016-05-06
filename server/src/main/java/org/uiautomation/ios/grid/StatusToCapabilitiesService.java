@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.uiautomation.ios.communication.Helper.extractObject;
 
@@ -35,12 +36,13 @@ public class StatusToCapabilitiesService {
     try {
       List<DesiredCapabilities> capabilities = new ArrayList<DesiredCapabilities>();
 
-      JSONObject status = getNodeStatusJson();
+      Map<String,?> status = getNodeStatusJson();
       if (status == null) {
         return null;
       }
 
-      JSONArray supportedApps = status.getJSONObject("value").getJSONArray("supportedApps");
+      // TODO freynaud json
+      JSONArray supportedApps = null;//status.get("value").getJSONArray("supportedApps");
 
       JsonToBeanConverter convertor = new JsonToBeanConverter();
       for (int i = 0; i < supportedApps.length(); i++) {
@@ -53,7 +55,7 @@ public class StatusToCapabilitiesService {
     }
   }
 
-  private JSONObject getNodeStatusJson() throws IOException, JSONException {
+  private Map<String,?> getNodeStatusJson() throws IOException, JSONException {
     HttpClient client = new DefaultHttpClient();
 
     String statusURL = this.url.toExternalForm();

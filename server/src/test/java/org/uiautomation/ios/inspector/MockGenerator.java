@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 
 public class MockGenerator {
 
@@ -86,12 +87,12 @@ public class MockGenerator {
     HttpHost h = new HttpHost(u.getHost(), u.getPort());
     HttpResponse response = client.execute(h, r);
 
-    JSONObject o = Helper.extractObject(response);
+    Map<String,?> o = Helper.extractObject(response);
     File base = new File("server/src/test/resources/mock");
     File status = new File(base, "status.json");
 
     FileWriter writer = new FileWriter(status);
-    writer.write(o.toString(2));
+    writer.write(o.toString());
     writer.close();
     driver.quit();
     server.stop();

@@ -27,6 +27,7 @@ import org.uiautomation.ios.inspector.views.RedirectView;
 import org.uiautomation.ios.inspector.views.View;
 
 import java.net.URL;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -61,8 +62,8 @@ public class SessionGuesserController implements IDECommandController {
     HttpHost h = new HttpHost(u.getHost(), u.getPort());
     HttpResponse response = client.execute(h, r);
 
-    JSONObject o = Helper.extractObject(response);
-    String id = o.optString("sessionId");
+    Map<String,?> o = Helper.extractObject(response);
+    String id = (String)o.get("sessionId");
     if (id == null) {
       throw new WebDriverException("cannot guess the sessionId for the IDE to use.");
     }

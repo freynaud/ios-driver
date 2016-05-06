@@ -46,7 +46,7 @@ public class GetConfigurationNHandler extends BaseNativeCommandHandler {
     Response resp = new Response();
     resp.setSessionId(getSession().getSessionId());
     resp.setStatus(0);
-    resp.setValue(res);
+    resp.setValue(res.toString());
     return resp;
   }
 
